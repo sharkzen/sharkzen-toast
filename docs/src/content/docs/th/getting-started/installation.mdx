@@ -1,0 +1,51 @@
+---
+title: การติดตั้ง
+description: ติดตั้ง Sharkzen Toast ด้วย npm, pnpm หรือ yarn และแสดง toast แรกได้ภายในไม่ถึงหนึ่งนาที
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+
+## ติดตั้ง
+
+<Tabs syncKey="pkg">
+  <TabItem label="npm">
+    ```sh
+    npm install sharkzen-toast
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```sh
+    pnpm add sharkzen-toast
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```sh
+    yarn add sharkzen-toast
+    ```
+  </TabItem>
+</Tabs>
+
+## แสดง toast แรก
+
+```ts
+import { toast } from 'sharkzen-toast'
+
+toast.success('บันทึกแล้ว')
+```
+
+แค่นี้เลย ไม่ต้องมี provider ไม่ต้องวาง component container และไม่ต้อง import ไฟล์ CSS การเรียกครั้งแรกจะสร้าง container และฝังสไตล์ให้เอง
+
+## สิ่งที่ได้มา
+
+- รองรับทั้ง ESM และ CommonJS พร้อม type ของ TypeScript
+- มี entry แยกสำหรับ React และ Next.js: `sharkzen-toast/react`
+- ไม่มี dependency ตอนรัน React เป็น optional peer dependency ที่ใช้เฉพาะ entry ของ React
+
+## ข้อกำหนด
+
+เบราว์เซอร์ตั้งแต่ปี 2022 เป็นต้นไป (Chrome 99, Safari 15.4, Firefox 97 หรือใหม่กว่า) เพราะสไตล์ใช้ CSS cascade layers ไลบรารีไม่แตะ `document` หรือ `window` ตอน import จึง import ในโค้ดที่เรนเดอร์ฝั่งเซิร์ฟเวอร์ได้อย่างปลอดภัย การเรียกใช้ฝั่งเซิร์ฟเวอร์จะไม่ทำอะไร
+
+## ขั้นต่อไป
+
+- [วิธีใช้กับ framework ของคุณ](../usage/) ทั้ง React, Next.js, Vue, Svelte และ JS ธรรมดา
+- [Playground](../../playground/) ลองทุก option

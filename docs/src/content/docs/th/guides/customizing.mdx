@@ -1,0 +1,131 @@
+---
+title: ตกแต่ง toast เอง
+description: เพิ่ม class และสไตล์ของคุณเอง icon เอง ปุ่ม Undo, callback ตอนปิด และ id ที่กำหนดเองเพื่อกัน toast ซ้ำใน Sharkzen Toast
+---
+
+ทุกอย่างในหน้านี้ใช้ได้ต่อ toast และที่ระบุไว้ตั้งเป็นค่าเริ่มต้นด้วย `toast.configure()` ได้
+
+## Class และสไตล์
+
+ใส่ class ของคุณเองให้ toast ใดก็ได้ ใช้ได้ทั้ง Tailwind, CSS modules หรือ CSS ธรรมดา:
+
+```ts
+toast.success('บันทึกแล้ว', { className: 'font-mono shadow-xl' })
+```
+
+สไตล์ของ library อยู่ใน CSS cascade layer ดังนั้น CSS ของคุณเอง, Tailwind (ทั้ง v3 และ v4) และ CSS modules จะชนะเสมอ ไม่ว่า specificity เป็นเท่าไหร่ ไม่ต้องใช้ `!important`
+
+### ตกแต่งแต่ละส่วน (Tailwind และอื่นๆ)
+
+`className` ใช้กับกล่อง toast ถ้าอยากตกแต่งส่วนอื่น ใช้ `classNames` โดยไม่ต้องรู้ว่าข้างในประกอบกันอย่างไร:
+
+```ts
+toast.success('บันทึกแล้ว', {
+  description: 'การเปลี่ยนแปลงของคุณเผยแพร่แล้ว',
+  action: { label: 'ดู' },
+  classNames: {
+    toast: 'bg-emerald-600 rounded-lg',
+    icon: 'text-white',
+    title: 'text-base font-bold',
+    description: 'text-emerald-100',
+    action: 'uppercase',
+    close: 'text-white/70',
+    progress: 'bg-white',
+  },
+})
+```
+
+ส่วนที่ใช้ได้คือ `toast`, `icon`, `content`, `title`, `description`, `action`, `close` และ `progress` (หลอดนับเวลา) ถ้าตั้ง `classNames` แบบรวมใน `toast.configure()` ด้วย จะถูกรวมกับของต่อ toast ทีละส่วน
+
+ถ้าอยากปรับเฉพาะกิจ ส่ง `style` แบบ inline ได้ รองรับ camelCase, kebab-case และตัวแปร CSS:
+
+```ts
+toast.info('มีข้อความใหม่', {
+  style: {
+    borderRadius: '8px',
+    '--sz-accent': '#a855f7', // สีของ icon หลอดเวลา และปุ่ม action
+    '--sz-bg': '#1e1b4b',
+  },
+})
+```
+
+| ตัวแปร | ควบคุม |
+|---|---|
+| `--sz-accent` | สีของ icon หลอดเวลา และปุ่ม action |
+| `--sz-bg`, `--sz-fg` | สีพื้นหลังและสีหัวเรื่อง |
+| `--sz-border`, `--sz-muted` | สีขอบและสีคำอธิบาย |
+| `--sz-radius`, `--sz-font` | ความโค้งของมุมและฟอนต์ |
+
+ตั้ง `className` หรือ `style` ครั้งเดียวให้ทุก toast ได้ด้วย `toast.configure()` ถ้าตั้งทั้งแบบรวมและต่อ toast `className` จะถูกรวมกัน และสไตล์จะถูกผสมโดยค่าต่อ toast ชนะ
+
+## Icon ของคุณเอง
+
+```ts
+toast.success('ปล่อยแล้ว', { icon: '🚀' }) // ข้อความหรืออีโมจิ
+toast('ไม่มี icon', { icon: false }) // ซ่อน icon
+```
+
+ถ้าเป็น SVG หรือ element อื่น ส่งเป็น DOM node ระบบจะคัดลอกให้ จึงใช้ node เดิมซ้ำได้:
+
+```ts
+const template = document.createElement('template')
+template.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22">…</svg>'
+
+toast('กำหนดเอง', { icon: template.content.firstElementChild! })
+```
+
+สตริงจะแสดงเป็นข้อความธรรมดาเสมอ ไม่ถูกตีความเป็น HTML จึงปลอดภัยแม้เป็นข้อความจากผู้ใช้ ส่วน React element (JSX) ยังไม่รองรับ
+
+## ปุ่ม action
+
+เพิ่มปุ่มสำหรับสิ่งอย่าง Undo เมื่อกดแล้ว toast จะปิด:
+
+```ts
+toast.success('ลบข้อความแล้ว', {
+  duration: 6000,
+  action: {
+    label: 'เลิกทำ',
+    onClick: () => restoreMessage(id),
+  },
+})
+```
+
+ตั้ง `keepOpen: true` ถ้าอยากให้ toast ค้างอยู่หลังกด
+
+## รู้ว่า toast ปิดเมื่อไหร่
+
+```ts
+toast('บันทึกแบบร่างแล้ว', {
+  onClose: (reason, id) => {
+    if (reason === 'timeout') console.log('ไม่มีใครกด')
+  },
+  onAutoClose: (id) => console.log('หมดเวลา', id),
+})
+```
+
+`onClose` ทำงานหนึ่งครั้งทุกครั้งที่ปิด ส่วน `onAutoClose` ทำงานเฉพาะตอนนับเวลาจบ และมาก่อน `onClose` เล็กน้อย `reason` เป็นหนึ่งใน:
+
+| Reason | ปิดโดย |
+|---|---|
+| `timeout` | นับเวลาจบ |
+| `button` | ปุ่มปิด |
+| `click` | คลิกที่ตัว toast (`closeOnClick`) |
+| `swipe` | ผู้เข้าชมปัดทิ้ง |
+| `action` | ปุ่ม action |
+| `dismiss` | โค้ดของคุณเรียก `toast.dismiss()` |
+
+ถ้า callback โยน error จะถูกบันทึกลง console และไม่ขัดขวางการปิด toast
+
+## กัน toast ซ้ำ
+
+ตั้ง `id` ของคุณเอง ถ้ามี toast ที่ใช้ id นั้นอยู่บนจอ การเรียกซ้ำจะรีเฟรช toast เดิมและเริ่มนับเวลาใหม่ แทนที่จะเพิ่มอีกอัน:
+
+```ts
+// เรียกทุกครั้งที่ request ล้มเหลว แต่จะมี toast เดียวเสมอ
+toast.error('คุณออฟไลน์อยู่', { id: 'offline', duration: 0 })
+
+// ต่อมาเมื่อเชื่อมต่อได้อีกครั้ง
+toast.dismiss('offline')
+```
+
+ใช้ `toast.isActive('offline')` เช็กว่ายังแสดงอยู่ไหม

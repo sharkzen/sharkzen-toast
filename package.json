@@ -1,0 +1,98 @@
+{
+  "name": "sharkzen-toast",
+  "version": "0.1.0",
+  "description": "Lightweight, framework-agnostic toast notifications with an optional React wrapper.",
+  "license": "MIT",
+  "author": "sharkzen",
+  "homepage": "https://sharkzen.github.io/sharkzen-toast/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sharkzen/sharkzen-toast.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sharkzen/sharkzen-toast/issues"
+  },
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react.d.ts",
+        "default": "./dist/react.js"
+      },
+      "require": {
+        "types": "./dist/react.d.cts",
+        "default": "./dist/react.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build",
+    "playground": "vite playground --open",
+    "docs:dev": "npm --prefix docs run dev",
+    "docs:build": "npm --prefix docs run build"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "jsdom": "^26.0.0",
+    "react": "^19.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  },
+  "keywords": [
+    "toast",
+    "toast-notification",
+    "notification",
+    "notifications",
+    "snackbar",
+    "alert",
+    "react",
+    "nextjs",
+    "vue",
+    "svelte",
+    "vanilla-js",
+    "typescript",
+    "zero-dependencies"
+  ],
+  "typesVersions": {
+    "*": {
+      "react": [
+        "./dist/react.d.ts"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

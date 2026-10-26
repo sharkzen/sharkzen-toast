@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sharkzen-toast playground</title>
+    <style>
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body { margin: 0; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; background: #0f1115; color: #f4f4f5;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; }
+      header { display: flex; align-items: center; gap: 10px; padding: 20px clamp(16px, 4vw, 32px); font-weight: 600; }
+      .logo { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: #60a5fa; color: #0f1115; font-size: 13px; }
+      .badge { margin-left: auto; font-size: 11px; color: #a1a1aa; border: 1px solid #30343b; border-radius: 999px; padding: 3px 10px; }
+      .hero { max-width: 720px; margin: clamp(8px, 3vw, 24px) auto clamp(20px, 4vw, 32px); padding: 0 clamp(16px, 4vw, 24px); text-align: center; }
+      h1 { margin: 0 0 12px; font-size: clamp(28px, 7vw, 56px); line-height: 1.08; overflow-wrap: anywhere; }
+      h1 span { color: #a1a1aa; }
+      .hero p { margin: 0; color: #a1a1aa; }
+
+      main { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(16px, 3vw, 24px); max-width: 1100px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 24px) 64px; }
+      @media (min-width: 861px) { main { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .sticky { position: sticky; top: 16px; align-self: start; } }
+      .card { min-width: 0; background: #14161b; border: 1px solid #30343b; border-radius: 16px; padding: clamp(14px, 3vw, 20px); }
+      h2 { margin: 0 0 12px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #a1a1aa; font-weight: 600; }
+      .group + .group { margin-top: 20px; }
+
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+      .chips label { position: relative; }
+      .chips input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+      .chips span { display: block; padding: 8px 12px; border: 1px solid #30343b; border-radius: 999px; color: #a1a1aa; }
+      .chips input:checked + span { background: #60a5fa; border-color: #60a5fa; color: #0f1115; font-weight: 600; }
+      .chips input:focus-visible + span { outline: 2px solid #60a5fa; outline-offset: 2px; }
+
+      .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 12px; }
+      .field label { display: block; margin-bottom: 6px; color: #a1a1aa; font-size: 12px; }
+      input[type=number], select { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #30343b; background: #0f1115; color: inherit; font: inherit; }
+      input:disabled { opacity: .4; }
+
+      .checks { display: grid; gap: 10px; }
+      .checks label { display: flex; align-items: center; gap: 10px; min-height: 28px; cursor: pointer; }
+      .checks input { flex-shrink: 0; width: 18px; height: 18px; accent-color: #60a5fa; }
+
+      .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+      button.btn { padding: 9px 16px; border-radius: 10px; border: 1px solid #30343b; background: #181a20; color: inherit; font: inherit; cursor: pointer; }
+      button.btn:hover { background: #20232b; }
+      button.btn.primary { background: #60a5fa; border-color: #60a5fa; color: #0f1115; font-weight: 600; }
+      button.btn.primary:hover { background: #7ab4fb; }
+
+      .code { position: relative; }
+      .code pre { margin: 0; padding: 16px; overflow-x: auto; border-radius: 10px; background: #0b0d10; border: 1px solid #23262d;
+        font: 12.5px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #d4d4d8; }
+      .code button { position: absolute; top: 8px; right: 8px; padding: 3px 9px; border-radius: 6px; border: 1px solid #30343b; background: #181a20; color: #a1a1aa; font-size: 11px; cursor: pointer; }
+      .code button:hover { color: #fff; }
+      /* Touch devices: 16px inputs avoid iOS zoom-on-focus; buttons share rows evenly. */
+      @media (max-width: 480px) {
+        input[type=number], select { font-size: 16px; }
+        .actions .btn { flex: 1 1 calc(50% - 8px); }
+        .code pre { font-size: 12px; padding: 12px; }
+      }
+      @media (max-width: 340px) { .actions .btn { flex-basis: 100%; } }
+      .note { overflow-wrap: anywhere; margin: 16px 0 0; color: #71717a; font-size: 12px; line-height: 1.6; }
+    </style>
+  </head>
+  <body>
+    <header><span class="logo">SZ</span>Sharkzen Toast<span class="badge">PLAYGROUND</span></header>
+
+    <section class="hero">
+      <h1>Notifications,<br /><span>beautifully simple.</span></h1>
+      <p>Change the options, press Show Toast, and see the real thing on this page.</p>
+    </section>
+
+    <main>
+      <div class="card" id="controls">
+        <div class="group">
+          <h2>Position</h2>
+          <div class="chips" id="position"></div>
+        </div>
+        <div class="group">
+          <h2>Type</h2>
+          <div class="chips" id="type"></div>
+        </div>
+        <div class="group">
+          <h2>Theme</h2>
+          <div class="chips" id="theme"></div>
+        </div>
+
+        <div class="group">
+          <h2>Options</h2>
+          <div class="fields">
+            <div class="field"><label for="duration">Auto close delay (ms)</label><input id="duration" type="number" min="500" step="500" /></div>
+            <div class="field"><label for="transition">Transition</label>
+              <select id="transition"><option>bounce</option><option>slide</option><option>zoom</option><option>flip</option></select></div>
+            <div class="field"><label for="limit">Limit (0 = none)</label><input id="limit" type="number" min="0" step="1" /></div>
+          </div>
+        </div>
+
+        <div class="group checks" id="checks"></div>
+
+        <div class="actions">
+          <button class="btn primary" id="show">Show Toast</button>
+          <button class="btn" id="promise">Promise</button>
+          <button class="btn" id="update">Update</button>
+          <button class="btn" id="clear">Clear All</button>
+          <button class="btn" id="reset">Reset</button>
+        </div>
+        <p class="note">
+          Options set on the container are inherited by every toast; options passed to a single toast win.
+          <em>Newest on top</em>, <em>RTL</em> and <em>Limit</em> can only be set on the container.
+          Try hovering a toast, swiping it sideways, or switching to another window.
+        </p>
+      </div>
+
+      <div class="card sticky">
+        <h2>Container</h2>
+        <div class="code"><pre id="code-config"></pre><button data-copy="code-config">Copy</button></div>
+        <h2 style="margin-top:20px">Emitter</h2>
+        <div class="code"><pre id="code-emit"></pre><button data-copy="code-emit">Copy</button></div>
+      </div>
+    </main>
+
+    <script type="module">
+      import { toast } from '../src/index.ts'
+
+      const DEFAULTS = {
+        position: 'top-right', type: 'success', theme: 'dark', transition: 'bounce',
+        duration: 3000, limit: 0,
+        hideProgress: false, closeOnClick: false, pauseOnFocusLoss: true, draggable: true,
+        noAutoClose: false, newestOnTop: false, pauseOnHover: true, rtl: false,
+      }
+      let state = { ...DEFAULTS }
+
+      const $ = (id) => document.getElementById(id)
+      const fill = (group, values) =>
+        ($(group).innerHTML = values
+          .map((v) => `<label><input type="radio" name="${group}" value="${v}"><span>${v}</span></label>`)
+          .join(''))
+
+      fill('position', ['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'])
+      fill('type', ['default', 'info', 'success', 'warning', 'error'])
+      fill('theme', ['light', 'dark', 'colored'])
+
+      const CHECKS = [
+        ['hideProgress', 'Hide progress bar (less fanciness!)'],
+        ['closeOnClick', 'Close on click'],
+        ['pauseOnFocusLoss', 'Pause toast when the window loses focus'],
+        ['draggable', 'Allow to drag and close the toast'],
+        ['noAutoClose', 'Disable auto-close'],
+        ['newestOnTop', 'Newest on top (play nice with bottom toasts)'],
+        ['pauseOnHover', 'Pause delay on hover'],
+        ['rtl', 'Right to left layout'],
+      ]
+      $('checks').innerHTML = CHECKS.map(([k, label]) => `<label><input type="checkbox" data-key="${k}">${label}</label>`).join('')
+
+      // The container-level config, in the shape toast.configure() expects.
+      const containerConfig = () => ({
+        position: state.position,
+        duration: state.noAutoClose ? 0 : state.duration,
+        progress: !state.hideProgress,
+        closeOnClick: state.closeOnClick,
+        pauseOnHover: state.pauseOnHover,
+        pauseOnFocusLoss: state.pauseOnFocusLoss,
+        draggable: state.draggable,
+        theme: state.theme,
+        transition: state.transition,
+        newestOnTop: state.newestOnTop,
+        rtl: state.rtl,
+        limit: state.limit,
+      })
+      // Per-toast options: everything except the container-only ones.
+      const emitOptions = () => {
+        const { newestOnTop, rtl, limit, ...rest } = containerConfig()
+        return rest
+      }
+
+      const MESSAGES = {
+        default: ['Wow so easy!', 'Toasts that feel as good as they look.'],
+        info: ['New update available', 'A new version is ready to install.'],
+        success: ['Changes saved', 'Your changes have been saved successfully.'],
+        warning: ['Review your settings', 'Some settings need your attention.'],
+        error: ['Something went wrong', "We couldn't save your changes. Try again."],
+      }
+
+      const literal = (obj) =>
+        '{\n' + Object.entries(obj).map(([k, v]) => `  ${k}: ${JSON.stringify(v).replace(/"/g, "'")},`).join('\n') + '\n}'
+
+      function renderCode() {
+        $('code-config').textContent = `toast.configure(${literal(containerConfig())})`
+        const [title, description] = MESSAGES[state.type]
+        const call = state.type === 'default' ? 'toast' : `toast.${state.type}`
+        $('code-emit').textContent = `${call}('${title}', ${literal({ description, ...emitOptions() })})`
+      }
+
+      function syncControls() {
+        for (const g of ['position', 'type', 'theme']) {
+          const input = document.querySelector(`input[name=${g}][value="${state[g]}"]`)
+          if (input) input.checked = true
+        }
+        $('duration').value = state.duration
+        $('duration').disabled = state.noAutoClose
+        $('transition').value = state.transition
+        $('limit').value = state.limit
+        for (const el of document.querySelectorAll('input[data-key]')) el.checked = state[el.dataset.key]
+      }
+
+      function apply() {
+        toast.configure(containerConfig())
+        renderCode()
+      }
+
+      let lastId = null
+      let promiseRuns = 0
+
+      $('controls').addEventListener('change', (e) => {
+        const t = e.target
+        if (t.type === 'radio') state[t.name] = t.value
+        else if (t.type === 'checkbox') state[t.dataset.key] = t.checked
+        else if (t.id === 'duration') state.duration = Math.max(500, Number(t.value) || DEFAULTS.duration)
+        else if (t.id === 'limit') state.limit = Math.max(0, Math.floor(Number(t.value)) || 0)
+        else if (t.id === 'transition') state.transition = t.value
+        syncControls()
+        apply()
+      })
+
+      $('show').onclick = () => {
+        const [title, description] = MESSAGES[state.type]
+        const fn = state.type === 'default' ? toast : toast[state.type]
+        lastId = fn(title, { description, ...emitOptions() })
+      }
+
+      $('promise').onclick = () => {
+        // Alternate so both outcomes get demonstrated.
+        const ok = promiseRuns++ % 2 === 0
+        const work = new Promise((res, rej) =>
+          setTimeout(() => (ok ? res('report.pdf') : rej(new Error('Network down'))), 2000),
+        )
+        lastId = null
+        toast
+          .promise(
+            work,
+            { pending: 'Uploading...', success: (f) => `Uploaded ${f}`, error: (e) => `Failed: ${e.message}` },
+            emitOptions(),
+          )
+          .catch(() => {})
+      }
+
+      $('update').onclick = () => {
+        if (lastId === null) return $('show').click()
+        toast.update(lastId, { title: 'Updated!', description: 'This toast was changed in place.', type: 'success' })
+      }
+
+      $('clear').onclick = () => toast.dismiss()
+
+      $('reset').onclick = () => {
+        state = { ...DEFAULTS }
+        toast.dismiss()
+        toast.reset()
+        syncControls()
+        apply()
+      }
+
+      document.addEventListener('click', async (e) => {
+        const target = e.target.closest('[data-copy]')
+        if (!target) return
+        try {
+          await navigator.clipboard.writeText($(target.dataset.copy).textContent)
+          target.textContent = 'Copied'
+        } catch {
+          target.textContent = 'Press Ctrl+C'
+        }
+        setTimeout(() => (target.textContent = 'Copy'), 1200)
+      })
+
+      syncControls()
+      apply()
+    </script>
+  </body>
+</html>

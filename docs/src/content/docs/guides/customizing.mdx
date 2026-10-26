@@ -1,0 +1,131 @@
+---
+title: Customizing toasts
+description: Add your own class names, inline styles and icons, an Undo action button, close callbacks, and a custom id that stops duplicate toasts in Sharkzen Toast.
+---
+
+Everything here works per toast or, where noted, as a default with `toast.configure()`.
+
+## Class names and styles
+
+Add your own class to any toast, for Tailwind, CSS modules or plain CSS:
+
+```ts
+toast.success('Saved', { className: 'font-mono shadow-xl' })
+```
+
+The library's styles live in a CSS cascade layer, so your own CSS, Tailwind utilities (v3 and v4) and CSS modules all win, whatever the specificity. You do not need `!important`.
+
+### Style each part (Tailwind and others)
+
+`className` styles the toast box. To style the other parts, use `classNames`, so you never need to know how a toast is built inside:
+
+```ts
+toast.success('Saved', {
+  description: 'Your changes are live.',
+  action: { label: 'View' },
+  classNames: {
+    toast: 'bg-emerald-600 rounded-lg',
+    icon: 'text-white',
+    title: 'text-base font-bold',
+    description: 'text-emerald-100',
+    action: 'uppercase',
+    close: 'text-white/70',
+    progress: 'bg-white',
+  },
+})
+```
+
+The parts are `toast`, `icon`, `content`, `title`, `description`, `action`, `close` and `progress` (the countdown bar). A global `classNames` from `toast.configure()` is merged with the per-toast one, part by part.
+
+For one-off tweaks, pass inline `style`. It accepts camelCase, kebab-case and CSS variables:
+
+```ts
+toast.info('New message', {
+  style: {
+    borderRadius: '8px',
+    '--sz-accent': '#a855f7', // icon, countdown bar and action button color
+    '--sz-bg': '#1e1b4b',
+  },
+})
+```
+
+| Variable | Controls |
+|---|---|
+| `--sz-accent` | Icon, countdown bar and action button color |
+| `--sz-bg`, `--sz-fg` | Background and title color |
+| `--sz-border`, `--sz-muted` | Border and description color |
+| `--sz-radius`, `--sz-font` | Corner radius and font |
+
+Set `className` or `style` once for every toast with `toast.configure()`. A global and a per-toast `className` are combined, and styles are merged with the per-toast values winning.
+
+## Your own icon
+
+```ts
+toast.success('Launched', { icon: '🚀' }) // text or emoji
+toast('No icon here', { icon: false }) // hide the icon
+```
+
+For an SVG or any other element, pass the DOM node. It is copied, so you can reuse the same node:
+
+```ts
+const template = document.createElement('template')
+template.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22">…</svg>'
+
+toast('Custom', { icon: template.content.firstElementChild! })
+```
+
+A string is always shown as plain text, never as HTML, so user-provided text is safe here. React elements (JSX) are not supported yet.
+
+## Action button
+
+Add a button for things like Undo. It closes the toast after the click:
+
+```ts
+toast.success('Message deleted', {
+  duration: 6000,
+  action: {
+    label: 'Undo',
+    onClick: () => restoreMessage(id),
+  },
+})
+```
+
+Set `keepOpen: true` to leave the toast on screen after the click.
+
+## Know when a toast closes
+
+```ts
+toast('Draft saved', {
+  onClose: (reason, id) => {
+    if (reason === 'timeout') console.log('nobody clicked it')
+  },
+  onAutoClose: (id) => console.log('timed out', id),
+})
+```
+
+`onClose` runs once for every close. `onAutoClose` runs only when the countdown ends, right before `onClose`. A `reason` is one of:
+
+| Reason | Closed by |
+|---|---|
+| `timeout` | The countdown ended |
+| `button` | The close button |
+| `click` | A click on the toast (`closeOnClick`) |
+| `swipe` | The visitor swiped it away |
+| `action` | The action button |
+| `dismiss` | Your code called `toast.dismiss()` |
+
+An error thrown inside a callback is logged and does not stop the toast from closing.
+
+## Stop duplicate toasts
+
+Give a toast your own `id`. While a toast with that id is on screen, showing it again refreshes that toast and restarts its countdown instead of adding another copy:
+
+```ts
+// Called on every failed request, but only one toast ever shows
+toast.error('You are offline', { id: 'offline', duration: 0 })
+
+// Later, when the connection is back
+toast.dismiss('offline')
+```
+
+Use `toast.isActive('offline')` to check whether it is still showing.

@@ -1,0 +1,50 @@
+---
+title: Options
+description: Every Sharkzen Toast option with its default value - duration, position, theme, transition, progress bar, drag to dismiss, queue limit and more.
+---
+
+## Per-toast options
+
+Pass these to a single toast, or set them as defaults with `toast.configure()`.
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `description` | `string` | none | Second line of text. Per toast only |
+| `duration` | `number` | `3000` | Milliseconds before closing. `0` keeps the toast until it is closed |
+| `progress` | `boolean` | `true` | Show the countdown bar |
+| `position` | `ToastPosition` | `'top-right'` | `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, `bottom-right` |
+| `theme` | `ToastTheme` | `'dark'` | `light`, `dark` or `colored` |
+| `transition` | `ToastTransition` | `'bounce'` | `bounce`, `slide`, `zoom` or `flip` |
+| `closeOnClick` | `boolean` | `false` | Close when the toast body is clicked |
+| `pauseOnHover` | `boolean` | `true` | Pause the countdown on hover and focus |
+| `pauseOnFocusLoss` | `boolean` | `true` | Pause while the browser window is not focused |
+| `draggable` | `boolean` | `true` | Swipe sideways to close |
+| `className` | `string` | none | Extra class names. Combined with a global `className` |
+| `classNames` | `ToastClassNames` | none | Classes per part: `toast`, `icon`, `content`, `title`, `description`, `action`, `close`, `progress` |
+| `colors` | `ToastColors` | none | Your own color per type: `success`, `error`, `info`, `warning`, `loading`, `default`. Any CSS color |
+| `style` | `ToastStyle` | none | Inline styles, including CSS variables like `--sz-accent` |
+| `icon` | `string \| Node \| false` | by type | Your own icon (text or a DOM node), or `false` to hide it |
+| `onClose` | `(reason, id) => void` | none | Runs once when the toast closes |
+| `onAutoClose` | `(id) => void` | none | Runs when the countdown ends and closes the toast |
+| `id` | `string` | automatic | Your own id. Showing the same id again refreshes the toast instead of adding a copy. Per toast only |
+| `action` | `{ label, onClick?, keepOpen? }` | none | An action button such as Undo. Per toast only |
+
+See [Customizing toasts](../../guides/customizing/) for examples.
+
+## Global-only options
+
+Set these with `toast.configure()`. They apply to the whole stack, so they cannot be set on one toast.
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `newestOnTop` | `boolean` | `false` | Put new toasts above older ones |
+| `rtl` | `boolean` | `false` | Right-to-left layout |
+| `limit` | `number` | `0` | Maximum toasts on screen. `0` means no limit. The rest wait in a queue |
+
+## Toast types
+
+`default`, `success`, `error`, `warning`, `info` and `loading`. The shortcuts like `toast.success()` set the type for you.
+
+## Accessibility
+
+Error toasts use `role="alert"` with assertive announcements. All other toasts use `role="status"` with polite announcements. The close button has an accessible label, and animations are shortened when the visitor prefers reduced motion.

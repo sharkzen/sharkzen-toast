@@ -1,0 +1,96 @@
+---
+title: Theming and layout
+description: Light, dark and colored themes, CSS variables, positions, transitions and the responsive behavior of Sharkzen Toast.
+---
+
+## Themes
+
+Three built-in themes. Set one globally or per toast:
+
+```ts
+toast.configure({ theme: 'light' }) // all toasts
+toast.success('Saved', { theme: 'colored' }) // just this one
+```
+
+| Theme | Look |
+|---|---|
+| `dark` (default) | Dark card with a colored icon and countdown bar |
+| `light` | White card with darker accent colors for contrast |
+| `colored` | Solid background that changes with the toast type |
+
+## Match your brand colors
+
+Give each toast type your own color. Types you leave out keep the built-in color:
+
+```ts
+toast.configure({
+  colors: {
+    success: '#14b8a6',
+    error: '#f43f5e',
+    info: '#8b5cf6',
+    warning: '#facc15',
+  },
+})
+```
+
+Use any CSS color. It colors the icon and the countdown bar in the `light` and `dark` themes, and becomes the background in the `colored` theme. In the `colored` theme a light `#rgb` or `#rrggbb` color, like the yellow above, automatically gets dark text so it stays readable. Other formats such as `rgb()` or color names keep the theme's text color.
+
+You can also set `colors` on a single toast:
+
+```ts
+toast.warning('Low disk space', { colors: { warning: '#f97316' } })
+```
+
+Or skip JavaScript and use plain CSS variables: `--sz-success`, `--sz-error`, `--sz-info`, `--sz-warning`, `--sz-loading` and `--sz-default`.
+
+```css
+:root {
+  --sz-success: #14b8a6;
+  --sz-error: #f43f5e;
+}
+```
+
+Want to keep the library's colors? Just don't set any. Everything works without them.
+
+## Customize with CSS variables
+
+Override these variables anywhere in your CSS, for example on `:root`:
+
+```css
+:root {
+  --sz-bg: #0b1220;
+  --sz-fg: #e2e8f0;
+  --sz-border: #1e293b;
+  --sz-muted: #94a3b8;
+  --sz-radius: 8px;
+  --sz-font: "Inter", sans-serif;
+}
+```
+
+| Variable | Controls |
+|---|---|
+| `--sz-bg` | Background color |
+| `--sz-fg` | Title text color |
+| `--sz-border` | Border color |
+| `--sz-muted` | Description text color |
+| `--sz-accent` | Icon, countdown bar and action button color |
+| `--sz-radius` | Corner radius |
+| `--sz-font` | Font family. Toasts inherit your page font when this is not set |
+
+## Positions
+
+`top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center` and `bottom-right`. Each one slides in from the matching direction.
+
+By default new toasts appear below older ones. Set `newestOnTop: true` in `toast.configure()` to flip that, which pairs well with bottom positions.
+
+## Transitions
+
+`bounce` (default), `slide`, `zoom` and `flip`. If a visitor has reduced motion enabled in their system, animations are shortened automatically.
+
+## Responsive behavior
+
+You do not need to configure anything for small screens. At 480px wide and below, toasts become full width, stick to the top or bottom edge depending on the position you chose, and respect the device safe area (notches and home indicators).
+
+## Right-to-left
+
+`toast.configure({ rtl: true })` mirrors the layout for Arabic, Hebrew and other RTL languages.

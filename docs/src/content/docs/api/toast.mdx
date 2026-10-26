@@ -1,0 +1,80 @@
+---
+title: toast
+description: API reference for the toast function and its helpers - success, error, warning, info, loading, promise, update, dismiss, configure and reset.
+---
+
+```ts
+import { toast } from 'sharkzen-toast'
+```
+
+## toast(title, options?)
+
+Shows a default toast and returns its id.
+
+```ts
+const id = toast('Hello', { description: 'Welcome back.' })
+```
+
+## Typed shortcuts
+
+```ts
+toast.success(title, options?)
+toast.error(title, options?)
+toast.warning(title, options?)
+toast.info(title, options?)
+toast.loading(title, options?)
+```
+
+Each returns the toast id. `loading` shows a spinner and does not close by itself until you update or dismiss it.
+
+## toast.promise(promise, messages, options?)
+
+```ts
+toast.promise(
+  promise, // a Promise<T> or () => Promise<T>
+  {
+    pending: string,
+    success: string | ((value: T) => string),
+    error: string | ((error: unknown) => string),
+  },
+  options,
+): Promise<T>
+```
+
+See [Promises and updates](../../guides/promise-and-update/).
+
+## toast.update(id, changes)
+
+Changes a toast in place. `changes` accepts a `title` plus any [option](../options/), including `type` and `description`.
+
+## toast.dismiss(id?)
+
+Closes one toast, or every toast and the waiting queue when called with no argument.
+
+## toast.isActive(id)
+
+Returns `true` while a toast with that id is on screen or waiting in the queue.
+
+## toast.configure(config)
+
+Sets defaults for every toast from now on. Takes any [option](../options/) except `type` and `description`, plus the global-only options `newestOnTop`, `rtl` and `limit`.
+
+## toast.reset()
+
+Restores the built-in defaults.
+
+## Types
+
+All types are exported:
+
+```ts
+import type {
+  ToastOptions,
+  ToastConfig,
+  ToastUpdate,
+  ToastType,
+  ToastPosition,
+  ToastTheme,
+  ToastTransition,
+} from 'sharkzen-toast'
+```

@@ -1,0 +1,168 @@
+---
+// Replaces Starlight's hero on the home page. The headline sits next to a working
+// toast maker so the first thing a visitor can do is make a toast and see the code.
+// Starlight scrolls to and labels the page by this id, so the h1 must keep it.
+const PAGE_TITLE_ID = '_top'
+
+const { lang } = Astro.locals.starlightRoute
+const th = lang === 'th'
+
+const t = th
+  ? {
+      title: 'toast แจ้งเตือนที่ใช้แล้วรู้สึกดี',
+      lede: 'ไม่มี dependency ไม่ต้องตั้งค่า ใช้ได้กับทุก framework ขนาดไม่ถึง 7 kB',
+      start: 'เริ่มต้นใช้งาน',
+      play: 'ลองใน Playground',
+      copy: 'คัดลอก',
+      copied: 'คัดลอกแล้ว',
+      kind: 'ประเภท',
+      message: 'ข้อความ',
+      description: 'คำอธิบาย',
+      noDescription: 'Promise ไม่ใช้คำอธิบาย',
+      show: 'แสดง toast',
+      kinds: { success: 'สำเร็จ', error: 'ผิดพลาด', info: 'ข้อมูล', warning: 'เตือน', promise: 'Promise' },
+      messages: { success: 'บันทึกแล้ว', error: 'บันทึกไม่สำเร็จ', info: 'มีเวอร์ชันใหม่', warning: 'พื้นที่ใกล้เต็ม', promise: 'กำลังอัปโหลด' },
+      descriptions: {
+        success: 'บันทึกการเปลี่ยนแปลงเรียบร้อย',
+        error: 'ลองอีกครั้ง หรือตรวจสอบการเชื่อมต่อ',
+        info: 'เวอร์ชันใหม่พร้อมให้ติดตั้งแล้ว',
+        warning: 'คุณใช้พื้นที่ไปแล้ว 90%',
+        promise: '',
+      },
+      done: 'อัปโหลดเสร็จแล้ว',
+      failed: 'อัปโหลดไม่สำเร็จ',
+      startHref: './getting-started/installation/',
+      playHref: './playground/',
+    }
+  : {
+      title: 'Toasts that feel good to use',
+      lede: 'No dependencies, no setup, any framework. Under 7 kB.',
+      start: 'Get started',
+      play: 'Open the playground',
+      copy: 'Copy',
+      copied: 'Copied',
+      kind: 'Type',
+      message: 'Message',
+      description: 'Description',
+      noDescription: 'Promise toasts have no description',
+      show: 'Show toast',
+      kinds: { success: 'Success', error: 'Error', info: 'Info', warning: 'Warning', promise: 'Promise' },
+      messages: { success: 'Changes saved', error: 'Could not save', info: 'Update available', warning: 'Storage almost full', promise: 'Uploading' },
+      descriptions: {
+        success: 'Your changes have been saved.',
+        error: 'Try again, or check your connection.',
+        info: 'A new version is ready to install.',
+        warning: 'You have used 90% of your space.',
+        promise: '',
+      },
+      done: 'Upload complete',
+      failed: 'Upload failed',
+      startHref: './getting-started/installation/',
+      playHref: './playground/',
+    }
+---
+
+<div class="zhero not-content" data-t={JSON.stringify(t)}>
+  <div>
+    <h1 id={PAGE_TITLE_ID} data-page-title>{t.title}</h1>
+    <p class="lede">{t.lede}</p>
+    <div class="cta">
+      <a class="zbtn primary" href={t.startHref}>{t.start}</a>
+      <a class="zbtn" href={t.playHref}>{t.play}</a>
+    </div>
+    <div class="zinstall">
+      <code>npm install sharkzen-toast</code>
+      <button type="button" id="zcopy">{t.copy}</button>
+    </div>
+  </div>
+
+  <form class="zcomposer" id="zcomposer" autocomplete="off">
+    <label class="cap" id="zkind-cap">{t.kind}</label>
+    <div class="types" role="radiogroup" aria-labelledby="zkind-cap">
+      {
+        Object.entries(t.kinds).map(([key, label], i) => (
+          <label>
+            <input type="radio" name="zkind" value={key} checked={i === 0} />
+            <span>{label}</span>
+          </label>
+        ))
+      }
+    </div>
+    <label class="cap" for="zmsg">{t.message}</label>
+    <input id="zmsg" type="text" maxlength="80" value={t.messages.success} />
+    <label class="cap" for="zdesc">{t.description}</label>
+    <input id="zdesc" type="text" maxlength="120" value={t.descriptions.success} />
+    <button type="submit" class="go" id="zgo">{t.show}</button>
+    <pre class="echo" id="zecho" aria-live="polite"></pre>
+  </form>
+</div>
+
+<script>
+  import { toast } from 'sharkzen-toast'
+
+  const root = document.querySelector<HTMLElement>('.zhero')!
+  const t = JSON.parse(root.dataset.t!)
+  const form = document.getElementById('zcomposer') as HTMLFormElement
+  const msg = document.getElementById('zmsg') as HTMLInputElement
+  const desc = document.getElementById('zdesc') as HTMLInputElement
+  const go = document.getElementById('zgo') as HTMLButtonElement
+  const echo = document.getElementById('zecho')!
+
+  const kind = () => form.querySelector<HTMLInputElement>('input[name=zkind]:checked')?.value ?? 'success'
+  const siteTheme = () => (document.documentElement.dataset.theme === 'light' ? 'light' : 'dark')
+  const quote = (s: string) => `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
+
+  // Switching type swaps in that type's sample text, but never overwrites what the visitor typed.
+  const edited = { msg: false, desc: false }
+  msg.addEventListener('input', () => ((edited.msg = true), render()))
+  desc.addEventListener('input', () => ((edited.desc = true), render()))
+  form.addEventListener('change', (e) => {
+    if ((e.target as HTMLInputElement).name !== 'zkind') return
+    const k = kind()
+    if (!edited.msg) msg.value = t.messages[k]
+    if (!edited.desc) desc.value = t.descriptions[k]
+    render()
+  })
+
+  function render() {
+    const isPromise = kind() === 'promise'
+    desc.disabled = isPromise
+    desc.placeholder = isPromise ? t.noDescription : ''
+    if (isPromise && !edited.desc) desc.value = ''
+
+    const title = quote(msg.value.trim() || '…')
+    const d = desc.value.trim()
+    echo.textContent = isPromise
+      ? `toast.promise(upload(), {\n  pending: ${title},\n  success: ${quote(t.done)},\n  error: ${quote(t.failed)},\n}, { position: 'top-center' })`
+      : `toast.${kind()}(${title}, {\n${d ? `  description: ${quote(d)},\n` : ''}  position: 'top-center',\n})`
+    go.disabled = !msg.value.trim()
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const title = msg.value.trim()
+    if (!title) return
+    // Follow the site's light/dark switch so the toast matches the page it appears on.
+    const options = { position: 'top-center' as const, theme: siteTheme() as 'light' | 'dark' }
+    const k = kind()
+    if (k === 'promise') {
+      const work = new Promise((res) => setTimeout(res, 1800))
+      toast.promise(work, { pending: title, success: t.done, error: t.failed }, options)
+    } else {
+      ;(toast as any)[k](title, { ...options, description: desc.value.trim() || undefined })
+    }
+  })
+
+  document.getElementById('zcopy')!.addEventListener('click', async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement
+    try {
+      await navigator.clipboard.writeText('npm install sharkzen-toast')
+      btn.textContent = t.copied
+    } catch {
+      btn.textContent = 'Ctrl+C'
+    }
+    setTimeout(() => (btn.textContent = t.copy), 1400)
+  })
+
+  render()
+</script>

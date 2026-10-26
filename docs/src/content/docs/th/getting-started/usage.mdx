@@ -1,0 +1,88 @@
+---
+title: วิธีใช้งาน
+description: วิธีใช้ Sharkzen Toast กับ JavaScript ธรรมดา, React, Next.js, Vue และ Svelte รวมถึงการเรนเดอร์ฝั่งเซิร์ฟเวอร์
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+
+ฟังก์ชัน `toast` ตัวเดียวกันใช้ได้ทุกที่ เลือก framework ของคุณ:
+
+<Tabs syncKey="framework">
+  <TabItem label="Vanilla JS">
+    ```ts
+    import { toast } from 'sharkzen-toast'
+
+    document.querySelector('#save')!.addEventListener('click', () => {
+      toast.success('บันทึกแล้ว', { description: 'การเปลี่ยนแปลงของคุณเผยแพร่แล้ว' })
+    })
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx
+    import { useToast } from 'sharkzen-toast/react'
+
+    export function SaveButton() {
+      const toast = useToast()
+      return <button onClick={() => toast.success('บันทึกแล้ว')}>บันทึก</button>
+    }
+    ```
+  </TabItem>
+  <TabItem label="Next.js">
+    ```tsx
+    'use client'
+
+    import { useToast } from 'sharkzen-toast/react'
+
+    export function SaveButton() {
+      const toast = useToast()
+      return <button onClick={() => toast.success('บันทึกแล้ว')}>บันทึก</button>
+    }
+    ```
+    toast ต้องใช้เบราว์เซอร์ จึงควรเรียกจาก client component (หรือใน event handler) ส่วน entry `sharkzen-toast/react` มี directive `"use client"` ให้แล้ว
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <script setup lang="ts">
+    import { toast } from 'sharkzen-toast'
+    </script>
+
+    <template>
+      <button @click="toast.success('บันทึกแล้ว')">บันทึก</button>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <script lang="ts">
+      import { toast } from 'sharkzen-toast'
+    </script>
+
+    <button on:click={() => toast.success('บันทึกแล้ว')}>บันทึก</button>
+    ```
+  </TabItem>
+</Tabs>
+
+## ตัวเลือกเสริม: ตั้งค่าเริ่มต้นครั้งเดียว
+
+ไม่จำเป็นต้องทำเพื่อใช้ไลบรารี ตัวอย่างด้านบนทุกอันใช้ได้เลยโดยไม่ต้องตั้งค่า ใช้ `toast.configure()` เมื่ออยากให้ทุก toast ในแอปหน้าตาหรือพฤติกรรมเหมือนกัน จะได้ไม่ต้องใส่ option ซ้ำทุกครั้ง เรียกครั้งเดียวตอนเริ่มแอป เช่นในไฟล์ entry หรือ client module ที่โหลดครั้งเดียว (ไม่ใช่ใน component ที่เรนเดอร์ซ้ำ) เรียกซ้ำก็ไม่เสียหาย แค่อัปเดตค่าเริ่มต้นใหม่
+
+```ts
+toast.configure({
+  position: 'bottom-center',
+  theme: 'colored',
+  duration: 5000,
+  limit: 3,
+})
+```
+
+หลังจากนั้น `toast.success('บันทึกแล้ว')` เฉยๆ จะทำงานเหมือนเรียกแบบนี้โดยไม่ต้องตั้งค่าอะไร:
+
+```ts
+toast.success('บันทึกแล้ว', { position: 'bottom-center', theme: 'colored', duration: 5000 })
+```
+
+option ที่ส่งให้ toast ตัวใดตัวหนึ่งจะมีผลเหนือค่าเริ่มต้นเสมอ
+
+## การเรนเดอร์ฝั่งเซิร์ฟเวอร์
+
+การนำเข้าไลบรารีบนเซิร์ฟเวอร์ปลอดภัย และการเรียก `toast()` ฝั่งเซิร์ฟเวอร์จะคืนสตริงว่างและไม่ทำอะไร จึงไม่เกิด error ตอน build ใน Next.js, Nuxt หรือ SvelteKit

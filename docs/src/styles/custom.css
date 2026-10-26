@@ -1,0 +1,382 @@
+/* ---------- Fonts ---------- */
+:root {
+  --sl-font: 'IBM Plex Sans Thai', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --sl-font-system-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display: 'Prompt', 'IBM Plex Sans Thai', ui-sans-serif, system-ui, sans-serif;
+  --sl-content-width: 46rem;
+  --sl-text-body: 1.0625rem;
+}
+
+/* ---------- Colour: deep sea (dark) ---------- */
+:root {
+  --sl-color-white: #f3fafb;
+  --sl-color-gray-1: #e3eef1;
+  --sl-color-gray-2: #c3d4da;
+  --sl-color-gray-3: #8fa9b3;
+  --sl-color-gray-4: #4f6e7a;
+  --sl-color-gray-5: #1b3a46;
+  --sl-color-gray-6: #0d252e;
+  --sl-color-gray-7: #08191f;
+  --sl-color-black: #061419;
+  --sl-color-accent-low: #0b3b3a;
+  --sl-color-accent: #14b8a6;
+  --sl-color-accent-high: #5eead4;
+  --sl-color-hairline: var(--sl-color-gray-5);
+}
+
+/* ---------- Colour: sea foam (light) ---------- */
+:root[data-theme='light'] {
+  --sl-color-white: #08222b;
+  --sl-color-gray-1: #123642;
+  --sl-color-gray-2: #2b4d59;
+  --sl-color-gray-3: #4a6975;
+  --sl-color-gray-4: #84a0aa;
+  --sl-color-gray-5: #cbdce1;
+  --sl-color-gray-6: #e8f1f3;
+  --sl-color-gray-7: #f2f8f9;
+  --sl-color-black: #ffffff;
+  --sl-color-accent-low: #cff3ed;
+  --sl-color-accent: #0f766e;
+  --sl-color-accent-high: #0b4f4a;
+}
+
+/* ---------- Type ---------- */
+:root :is(h1, h2, h3, h4) {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.sl-markdown-content :is(h2, h3, h4) {
+  font-family: var(--font-display);
+}
+.site-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+html:not(:lang(th)) :is(h1, h2) {
+  letter-spacing: -0.02em;
+}
+/* Thai stacks tall marks above and below the line, so it needs more air than Latin. */
+html:lang(th) body {
+  line-height: 1.85;
+}
+html:lang(th) .sl-markdown-content :is(h1, h2, h3) {
+  line-height: 1.45;
+}
+.sl-markdown-content a:not(.not-content a) {
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+/* ---------- Chrome ---------- */
+header.header {
+  border-bottom: 1px solid var(--sl-color-hairline);
+  backdrop-filter: saturate(1.4) blur(10px);
+  background: color-mix(in srgb, var(--sl-color-bg-nav) 88%, transparent);
+}
+.sidebar-content {
+  font-size: 0.9rem;
+}
+.sidebar-content a[aria-current='page'] {
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-accent-high);
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+.sidebar-content a {
+  border-radius: 0.5rem;
+}
+.sidebar-content details summary .large {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.sl-markdown-content table {
+  display: table;
+  width: 100%;
+}
+.sl-markdown-content :not(pre) > code {
+  border-radius: 0.35rem;
+}
+:focus-visible {
+  outline: 2px solid var(--sl-color-accent-high);
+  outline-offset: 2px;
+}
+
+/* ---------- Home ---------- */
+.zhero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+  padding-block: clamp(1.5rem, 5vw, 4rem);
+}
+.zhero > * {
+  min-width: 0;
+}
+@media (min-width: 62rem) {
+  .zhero {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  }
+}
+.zhero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 6.2vw, 4.25rem);
+  line-height: 1.08;
+  color: var(--sl-color-white);
+  text-wrap: balance;
+}
+html:lang(th) .zhero h1 {
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+.zhero .lede {
+  margin: 1.25rem 0 0;
+  max-width: 34rem;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  line-height: 1.6;
+  color: var(--sl-color-gray-2);
+}
+.zhero .cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+.zbtn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.9rem;
+  padding: 0 1.4rem;
+  border: 1px solid var(--sl-color-gray-4);
+  border-radius: 0.7rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: var(--sl-color-white);
+  text-decoration: none;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.zbtn:hover {
+  background: var(--sl-color-gray-6);
+  border-color: var(--sl-color-accent);
+}
+.zbtn.primary {
+  background: var(--sl-color-accent);
+  border-color: var(--sl-color-accent);
+  color: var(--sl-color-text-invert);
+}
+.zbtn.primary:hover {
+  filter: brightness(1.08);
+}
+.zinstall {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 0.35rem 0.4rem 0.35rem 1rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.7rem;
+  background: var(--sl-color-gray-7);
+  font-family: var(--sl-font-mono);
+  font-size: 0.88rem;
+  color: var(--sl-color-gray-1);
+  max-width: 100%;
+}
+.zinstall button {
+  padding: 0.35rem 0.75rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--sl-color-gray-5);
+  color: var(--sl-color-white);
+  font: inherit;
+  font-family: var(--sl-font);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.zinstall button:hover {
+  background: var(--sl-color-accent-low);
+}
+
+/* The composer: a real toast maker. It is the one loud thing on the page. */
+.zcomposer {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 1.1rem;
+  background: var(--sl-color-gray-6);
+}
+.zcomposer label.cap {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--sl-color-gray-2);
+}
+.zcomposer .types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+.zcomposer .types label {
+  position: relative;
+}
+.zcomposer .types input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.zcomposer .types span {
+  display: block;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--sl-color-gray-2);
+}
+.zcomposer .types input:checked + span {
+  background: var(--sl-color-accent);
+  border-color: var(--sl-color-accent);
+  color: var(--sl-color-text-invert);
+  font-weight: 600;
+}
+.zcomposer .types input:focus-visible + span {
+  outline: 2px solid var(--sl-color-accent-high);
+  outline-offset: 2px;
+}
+.zcomposer .row {
+  display: flex;
+  gap: 0.6rem;
+}
+.zcomposer input[type='text'] {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.9rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--sl-color-gray-4);
+  border-radius: 0.65rem;
+  background: var(--sl-color-black);
+  color: var(--sl-color-white);
+  font: inherit;
+  font-size: 1rem;
+}
+.zcomposer input[type='text']:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.zcomposer .go {
+  width: 100%;
+  min-height: 2.9rem;
+  margin-top: 0.25rem;
+  padding: 0 1.25rem;
+  border: 0;
+  border-radius: 0.65rem;
+  background: var(--sl-color-accent);
+  color: var(--sl-color-text-invert);
+  font-family: var(--font-display);
+  font-weight: 600;
+  cursor: pointer;
+}
+.zcomposer .go:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.zcomposer .go:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.zcomposer pre.echo {
+  margin: 1rem 0 0;
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  border-radius: 0.65rem;
+  background: var(--sl-color-black);
+  border: 1px solid var(--sl-color-gray-5);
+  font-family: var(--sl-font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--sl-color-gray-1);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Feature list: hairlines instead of boxes. */
+.zfeatures {
+  display: grid;
+  gap: 0 3rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 48rem) {
+  .zfeatures {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.zfeatures li {
+  margin: 0;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--sl-color-hairline);
+}
+.zfeatures strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--sl-color-white);
+}
+.zfeatures p {
+  margin: 0;
+  color: var(--sl-color-gray-2);
+  line-height: 1.65;
+}
+
+/* Next-step rows. */
+.znext {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.znext li {
+  margin: 0;
+}
+.znext a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.1rem 0.25rem;
+  border-top: 1px solid var(--sl-color-hairline);
+  text-decoration: none;
+  color: var(--sl-color-white);
+}
+.znext li:last-child a {
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+.znext a:hover {
+  background: var(--sl-color-gray-7);
+}
+.znext a:hover b {
+  color: var(--sl-color-accent-high);
+}
+.znext b {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+.znext span {
+  color: var(--sl-color-gray-3);
+  font-size: 0.95rem;
+  text-align: right;
+}
+@media (max-width: 40rem) {
+  .znext a {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .znext span {
+    text-align: left;
+  }
+}

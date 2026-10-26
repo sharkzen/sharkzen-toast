@@ -1,0 +1,291 @@
+---
+// Interactive playground: every control changes the real library running on this page,
+// and the code panels show what to paste into your own project.
+interface Props {
+  lang?: 'en' | 'th'
+}
+const { lang = 'en' } = Astro.props
+
+const labels = {
+  en: {
+    position: 'Position', type: 'Type', theme: 'Theme', options: 'Options',
+    colors: 'Brand colors', useColors: 'Use my own colors',
+    delay: 'Auto close delay (ms)', transition: 'Transition', limit: 'Limit (0 = none)',
+    hideProgress: 'Hide progress bar', closeOnClick: 'Close on click',
+    pauseOnFocusLoss: 'Pause when the window loses focus', draggable: 'Swipe to dismiss',
+    noAutoClose: 'Disable auto-close', newestOnTop: 'Newest on top', pauseOnHover: 'Pause on hover',
+    rtl: 'Right-to-left layout', show: 'Show toast', promise: 'Promise', update: 'Update',
+    clear: 'Clear all', reset: 'Reset', container: 'Global defaults', emitter: 'Single toast',
+    copy: 'Copy', copied: 'Copied', hint: 'Newest on top, RTL and Limit can only be set globally.',
+    messages: {
+      default: ['Wow so easy!', 'Toasts that feel as good as they look.'],
+      info: ['New update available', 'A new version is ready to install.'],
+      success: ['Changes saved', 'Your changes have been saved successfully.'],
+      warning: ['Review your settings', 'Some settings need your attention.'],
+      error: ['Something went wrong', "We couldn't save your changes. Try again."],
+    },
+    pending: 'Uploading...', ok: (f: string) => `Uploaded ${f}`, fail: 'Network down',
+    updatedTitle: 'Updated!', updatedBody: 'This toast was changed in place.',
+  },
+  th: {
+    position: 'ตำแหน่ง', type: 'ประเภท', theme: 'ธีม', options: 'ตัวเลือก',
+    colors: 'สีของแบรนด์', useColors: 'ใช้สีของฉันเอง',
+    delay: 'ปิดอัตโนมัติ (มิลลิวินาที)', transition: 'แอนิเมชัน', limit: 'จำกัดจำนวน (0 = ไม่จำกัด)',
+    hideProgress: 'ซ่อนหลอดเวลา', closeOnClick: 'คลิกที่ toast เพื่อปิด',
+    pauseOnFocusLoss: 'หยุดนับเมื่อออกจากหน้าต่าง', draggable: 'ปัดข้างเพื่อปิด',
+    noAutoClose: 'ไม่ปิดอัตโนมัติ', newestOnTop: 'อันใหม่อยู่บนสุด', pauseOnHover: 'หยุดนับเมื่อ hover',
+    rtl: 'เลย์เอาต์ขวาไปซ้าย', show: 'แสดง toast', promise: 'Promise', update: 'อัปเดต',
+    clear: 'ล้างทั้งหมด', reset: 'รีเซ็ต', container: 'ค่าเริ่มต้นรวม', emitter: 'toast เดี่ยว',
+    copy: 'คัดลอก', copied: 'คัดลอกแล้ว', hint: 'อันใหม่อยู่บนสุด, RTL และการจำกัดจำนวน ตั้งได้เฉพาะแบบรวม',
+    messages: {
+      default: ['ง่ายอย่างนี้เลย!', 'toast ที่ใช้สบายพอๆ กับที่สวย'],
+      info: ['มีเวอร์ชันใหม่', 'เวอร์ชันใหม่พร้อมให้ติดตั้งแล้ว'],
+      success: ['บันทึกแล้ว', 'บันทึกการเปลี่ยนแปลงเรียบร้อย'],
+      warning: ['ตรวจสอบการตั้งค่า', 'มีบางการตั้งค่าที่ต้องดูอีกครั้ง'],
+      error: ['เกิดข้อผิดพลาด', 'บันทึกไม่สำเร็จ ลองอีกครั้ง'],
+    },
+    pending: 'กำลังอัปโหลด...', ok: (f: string) => `อัปโหลด ${f} แล้ว`, fail: 'เครือข่ายขัดข้อง',
+    updatedTitle: 'อัปเดตแล้ว!', updatedBody: 'toast นี้ถูกแก้ไขในที่เดิม',
+  },
+}[lang]
+
+// Functions can't cross into the browser as JSON, so ship the strings and rebuild the helpers there.
+const { ok, fail, ...data } = labels
+const clientLabels = { ...data, ok: ok('{file}'), fail }
+---
+
+<div id="szpg" class="not-content" data-labels={JSON.stringify(clientLabels)}>
+  <div class="szpg-grid">
+    <div class="szpg-card" id="szpg-controls"></div>
+    <div class="szpg-card szpg-sticky">
+      <h4 id="szpg-h-config"></h4>
+      <div class="szpg-code"><pre id="szpg-config"></pre><button data-copy="szpg-config"></button></div>
+      <h4 id="szpg-h-emit"></h4>
+      <div class="szpg-code"><pre id="szpg-emit"></pre><button data-copy="szpg-emit"></button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { toast } from 'sharkzen-toast'
+
+  const root = document.getElementById('szpg')!
+  const L = JSON.parse(root.dataset.labels!)
+  const $ = (id: string) => document.getElementById(id)!
+  const siteTheme = () => (document.documentElement.dataset.theme === 'light' ? 'light' : 'dark')
+
+  const DEFAULTS = {
+    position: 'top-right', type: 'success', theme: siteTheme(), transition: 'bounce',
+    duration: 3000, limit: 0,
+    hideProgress: false, closeOnClick: false, pauseOnFocusLoss: true, draggable: true,
+    noAutoClose: false, newestOnTop: false, pauseOnHover: true, rtl: false,
+    useColors: false, cSuccess: '#14b8a6', cError: '#f43f5e', cInfo: '#8b5cf6', cWarning: '#facc15',
+  } as Record<string, any>
+  const cap = (s: string) => s[0]!.toUpperCase() + s.slice(1)
+  let state = { ...DEFAULTS }
+
+  const chips = (group: string, values: string[]) =>
+    `<div class="szpg-chips">${values
+      .map((v) => `<label><input type="radio" name="${group}" value="${v}"><span>${v}</span></label>`)
+      .join('')}</div>`
+  const CHECKS = ['hideProgress', 'closeOnClick', 'pauseOnFocusLoss', 'draggable', 'noAutoClose', 'newestOnTop', 'pauseOnHover', 'rtl']
+
+  $('szpg-controls').innerHTML = `
+    <h4>${L.position}</h4>${chips('position', ['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'])}
+    <h4>${L.type}</h4>${chips('type', ['default', 'info', 'success', 'warning', 'error'])}
+    <h4>${L.theme}</h4>${chips('theme', ['light', 'dark', 'colored'])}
+    <h4>${L.colors}</h4>
+    <div class="szpg-checks"><label><input type="checkbox" data-key="useColors">${L.useColors}</label></div>
+    <div class="szpg-colors" id="szpg-colors">
+      ${['success', 'error', 'info', 'warning'].map((t) => `<label>${t}<input type="color" data-color="${t}"></label>`).join('')}
+    </div>
+    <h4>${L.options}</h4>
+    <div class="szpg-fields">
+      <div><label for="szpg-duration">${L.delay}</label><input id="szpg-duration" type="number" min="500" step="500"></div>
+      <div><label for="szpg-transition">${L.transition}</label>
+        <select id="szpg-transition"><option>bounce</option><option>slide</option><option>zoom</option><option>flip</option></select></div>
+      <div><label for="szpg-limit">${L.limit}</label><input id="szpg-limit" type="number" min="0" step="1"></div>
+    </div>
+    <div class="szpg-checks">${CHECKS.map((k) => `<label><input type="checkbox" data-key="${k}">${L[k]}</label>`).join('')}</div>
+    <div class="szpg-actions">
+      <button class="szpg-btn szpg-primary" id="szpg-show">${L.show}</button>
+      <button class="szpg-btn" id="szpg-promise">${L.promise}</button>
+      <button class="szpg-btn" id="szpg-update">${L.update}</button>
+      <button class="szpg-btn" id="szpg-clear">${L.clear}</button>
+      <button class="szpg-btn" id="szpg-reset">${L.reset}</button>
+    </div>
+    <p class="szpg-hint">${L.hint}</p>`
+  $('szpg-h-config').textContent = L.container
+  $('szpg-h-emit').textContent = L.emitter
+  document.querySelectorAll<HTMLElement>('[data-copy]').forEach((b) => (b.textContent = L.copy))
+
+  const containerConfig = () => ({
+    position: state.position,
+    duration: state.noAutoClose ? 0 : state.duration,
+    progress: !state.hideProgress,
+    closeOnClick: state.closeOnClick,
+    pauseOnHover: state.pauseOnHover,
+    pauseOnFocusLoss: state.pauseOnFocusLoss,
+    draggable: state.draggable,
+    theme: state.theme,
+    transition: state.transition,
+    newestOnTop: state.newestOnTop,
+    rtl: state.rtl,
+    limit: state.limit,
+    ...(state.useColors
+      ? { colors: { success: state.cSuccess, error: state.cError, info: state.cInfo, warning: state.cWarning } }
+      : {}),
+  })
+  // Per-toast options exclude the settings that only make sense globally.
+  const emitOptions = () => {
+    const { newestOnTop, rtl, limit, ...rest } = containerConfig()
+    return rest
+  }
+  const literal = (obj: Record<string, unknown>, depth = 0): string => {
+    const pad = '  '.repeat(depth + 1)
+    const lines = Object.entries(obj).map(([k, v]) =>
+      v && typeof v === 'object'
+        ? `${pad}${k}: ${literal(v as Record<string, unknown>, depth + 1)},`
+        : `${pad}${k}: ${JSON.stringify(v).replace(/"/g, "'")},`,
+    )
+    return '{\n' + lines.join('\n') + '\n' + '  '.repeat(depth) + '}'
+  }
+
+  const renderCode = () => {
+    $('szpg-config').textContent = `toast.configure(${literal(containerConfig())})`
+    const [title, description] = L.messages[state.type]
+    const call = state.type === 'default' ? 'toast' : `toast.${state.type}`
+    $('szpg-emit').textContent = `${call}('${title}', ${literal({ description, ...emitOptions() })})`
+  }
+
+  const syncControls = () => {
+    for (const g of ['position', 'type', 'theme']) {
+      const input = root.querySelector<HTMLInputElement>(`input[name=${g}][value="${state[g]}"]`)
+      if (input) input.checked = true
+    }
+    ;($('szpg-duration') as HTMLInputElement).value = String(state.duration)
+    ;($('szpg-duration') as HTMLInputElement).disabled = state.noAutoClose
+    ;($('szpg-transition') as HTMLSelectElement).value = state.transition
+    ;($('szpg-limit') as HTMLInputElement).value = String(state.limit)
+    root.querySelectorAll<HTMLInputElement>('input[data-key]').forEach((el) => (el.checked = !!state[el.dataset.key!]))
+    $('szpg-colors').hidden = !state.useColors
+    root
+      .querySelectorAll<HTMLInputElement>('input[data-color]')
+      .forEach((el) => (el.value = state['c' + cap(el.dataset.color!)]))
+  }
+
+  const apply = () => {
+    // configure() only adds to the defaults, so start clean to let unticked options go away.
+    toast.reset()
+    toast.configure(containerConfig() as any)
+    renderCode()
+  }
+
+  let lastId: string | null = null
+  let promiseRuns = 0
+
+  // Color pickers update live while dragging, so listen to input as well as change.
+  $('szpg-controls').addEventListener('input', (e) => {
+    const t = e.target as HTMLInputElement
+    if (!t.dataset.color) return
+    state['c' + cap(t.dataset.color)] = t.value
+    apply()
+  })
+
+  $('szpg-controls').addEventListener('change', (e) => {
+    const t = e.target as HTMLInputElement
+    if (t.type === 'radio') state[t.name] = t.value
+    else if (t.type === 'checkbox') state[t.dataset.key!] = t.checked
+    else if (t.id === 'szpg-duration') state.duration = Math.max(500, Number(t.value) || DEFAULTS.duration)
+    else if (t.id === 'szpg-limit') state.limit = Math.max(0, Math.floor(Number(t.value)) || 0)
+    else if (t.id === 'szpg-transition') state.transition = t.value
+    syncControls()
+    apply()
+  })
+
+  $('szpg-show').onclick = () => {
+    const [title, description] = L.messages[state.type]
+    const fn = state.type === 'default' ? toast : (toast as any)[state.type]
+    lastId = fn(title, { description, ...emitOptions() })
+  }
+
+  $('szpg-promise').onclick = () => {
+    const ok = promiseRuns++ % 2 === 0 // alternate so both outcomes get shown
+    const work = new Promise<string>((res, rej) =>
+      setTimeout(() => (ok ? res('report.pdf') : rej(new Error(L.fail))), 2000),
+    )
+    lastId = null
+    toast
+      .promise(
+        work,
+        { pending: L.pending, success: (f) => L.ok.replace('{file}', f), error: (e) => (e as Error).message },
+        emitOptions() as any,
+      )
+      .catch(() => {})
+  }
+
+  $('szpg-update').onclick = () => {
+    if (lastId === null) return $('szpg-show').click()
+    toast.update(lastId, { title: L.updatedTitle, description: L.updatedBody, type: 'success' })
+  }
+
+  $('szpg-clear').onclick = () => toast.dismiss()
+
+  $('szpg-reset').onclick = () => {
+    state = { ...DEFAULTS, theme: siteTheme() }
+    toast.dismiss()
+    toast.reset()
+    syncControls()
+    apply()
+  }
+
+  root.addEventListener('click', async (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-copy]')
+    if (!btn) return
+    try {
+      await navigator.clipboard.writeText($(btn.dataset.copy!).textContent ?? '')
+      btn.textContent = L.copied
+    } catch {
+      btn.textContent = 'Ctrl+C'
+    }
+    setTimeout(() => (btn.textContent = L.copy), 1200)
+  })
+
+  syncControls()
+  apply()
+</script>
+
+<style is:global>
+  #szpg h4 { margin: 18px 0 8px; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sl-color-gray-3); }
+  #szpg h4:first-child { margin-top: 0; }
+  .szpg-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  @media (min-width: 62rem) { .szpg-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .szpg-sticky { position: sticky; top: calc(var(--sl-nav-height) + 1rem); align-self: start; } }
+  .szpg-card { min-width: 0; padding: clamp(0.9rem, 3vw, 1.25rem); border: 1px solid var(--sl-color-gray-5); border-radius: 0.75rem; background: var(--sl-color-bg-nav); }
+  .szpg-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .szpg-chips label { position: relative; }
+  .szpg-chips input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .szpg-chips span { display: block; padding: 0.4rem 0.8rem; border: 1px solid var(--sl-color-gray-5); border-radius: 999px; color: var(--sl-color-gray-2); font-size: 0.85rem; }
+  .szpg-chips input:checked + span { background: var(--sl-color-accent); border-color: var(--sl-color-accent); color: var(--sl-color-text-invert); font-weight: 600; }
+  .szpg-chips input:focus-visible + span { outline: 2px solid var(--sl-color-accent-high); outline-offset: 2px; }
+  .szpg-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 0.75rem; }
+  .szpg-fields label { display: block; margin-bottom: 0.3rem; font-size: 0.75rem; color: var(--sl-color-gray-3); }
+  .szpg-fields input, .szpg-fields select { width: 100%; padding: 0.45rem 0.6rem; border: 1px solid var(--sl-color-gray-5); border-radius: 0.5rem; background: var(--sl-color-bg); color: var(--sl-color-text); font: inherit; font-size: 0.9rem; }
+  .szpg-fields input:disabled { opacity: 0.4; }
+  .szpg-checks { display: grid; gap: 0.5rem; margin-top: 1rem; }
+  .szpg-checks label { display: flex; align-items: center; gap: 0.6rem; min-height: 1.75rem; cursor: pointer; font-size: 0.9rem; }
+  .szpg-checks input { flex-shrink: 0; width: 1.1rem; height: 1.1rem; accent-color: var(--sl-color-accent); }
+  .szpg-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
+  .szpg-btn { padding: 0.5rem 1rem; border: 1px solid var(--sl-color-gray-5); border-radius: 0.6rem; background: var(--sl-color-bg); color: var(--sl-color-text); font: inherit; font-size: 0.9rem; cursor: pointer; }
+  .szpg-btn:hover { background: var(--sl-color-gray-6); }
+  .szpg-primary { background: var(--sl-color-accent); border-color: var(--sl-color-accent); color: var(--sl-color-text-invert); font-weight: 600; }
+  .szpg-primary:hover { background: var(--sl-color-accent); filter: brightness(1.1); }
+  .szpg-colors { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; margin-top: 0.75rem; }
+  .szpg-colors[hidden] { display: none; }
+  .szpg-colors label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--sl-color-gray-2); }
+  .szpg-colors input { width: 2.2rem; height: 1.8rem; padding: 0; border: 1px solid var(--sl-color-gray-5); border-radius: 0.4rem; background: none; cursor: pointer; }
+  .szpg-hint { margin: 1rem 0 0; font-size: 0.8rem; color: var(--sl-color-gray-3); }
+  .szpg-code { position: relative; }
+  .szpg-code pre { margin: 0 0 0.5rem; padding: 0.9rem; overflow-x: auto; border-radius: 0.5rem; background: var(--sl-color-black); border: 1px solid var(--sl-color-gray-5); font-size: 0.78rem; line-height: 1.6; color: var(--sl-color-white); }
+  .szpg-code button { position: absolute; top: 0.4rem; right: 0.4rem; padding: 0.1rem 0.5rem; border: 1px solid var(--sl-color-gray-5); border-radius: 0.4rem; background: var(--sl-color-bg); color: var(--sl-color-gray-2); font-size: 0.7rem; cursor: pointer; }
+  @media (max-width: 30rem) { .szpg-btn { flex: 1 1 calc(50% - 0.5rem); } .szpg-fields input, .szpg-fields select { font-size: 1rem; } }
+</style>

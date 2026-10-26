@@ -1,0 +1,51 @@
+---
+title: Installation
+description: Install Sharkzen Toast with npm, pnpm or yarn and show your first toast notification in under a minute.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+
+## Install
+
+<Tabs syncKey="pkg">
+  <TabItem label="npm">
+    ```sh
+    npm install sharkzen-toast
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```sh
+    pnpm add sharkzen-toast
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```sh
+    yarn add sharkzen-toast
+    ```
+  </TabItem>
+</Tabs>
+
+## Show your first toast
+
+```ts
+import { toast } from 'sharkzen-toast'
+
+toast.success('Changes saved')
+```
+
+That is the whole setup. There is no provider, no container component and no CSS file to import. The first call creates the container and injects the styles.
+
+## What you get
+
+- ESM and CommonJS builds, with TypeScript types included.
+- A separate entry for React and Next.js: `sharkzen-toast/react`.
+- No runtime dependencies. React is an optional peer dependency used only by the React entry.
+
+## Requirements
+
+Any modern browser from 2022 on (Chrome 99, Safari 15.4, Firefox 97 or newer), because the styles use CSS cascade layers. The library never touches `document` or `window` when it is imported, so it is safe to import in server-rendered code. Calls made on the server do nothing.
+
+## Next steps
+
+- [Usage with your framework](../usage/) for React, Next.js, Vue, Svelte and plain JS.
+- [Playground](../../playground/) to try every option.

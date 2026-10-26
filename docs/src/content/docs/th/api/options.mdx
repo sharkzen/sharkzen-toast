@@ -1,0 +1,50 @@
+---
+title: Options
+description: ทุก option ของ Sharkzen Toast พร้อมค่าเริ่มต้น ทั้ง duration, position, theme, transition, หลอดเวลา, ปัดเพื่อปิด, การจำกัดคิว และอื่นๆ
+---
+
+## Option ต่อ toast
+
+ส่งให้ toast ตัวเดียว หรือตั้งเป็นค่าเริ่มต้นด้วย `toast.configure()`
+
+| Option | Type | ค่าเริ่มต้น | คำอธิบาย |
+|---|---|---|---|
+| `description` | `string` | ไม่มี | ข้อความบรรทัดที่สอง ใช้ได้เฉพาะต่อ toast |
+| `duration` | `number` | `3000` | มิลลิวินาทีก่อนปิด `0` คือค้างไว้จนกว่าจะปิด |
+| `progress` | `boolean` | `true` | แสดงหลอดนับเวลา |
+| `position` | `ToastPosition` | `'top-right'` | `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, `bottom-right` |
+| `theme` | `ToastTheme` | `'dark'` | `light`, `dark` หรือ `colored` |
+| `transition` | `ToastTransition` | `'bounce'` | `bounce`, `slide`, `zoom` หรือ `flip` |
+| `closeOnClick` | `boolean` | `false` | ปิดเมื่อคลิกที่ตัว toast |
+| `pauseOnHover` | `boolean` | `true` | หยุดนับเวลาเมื่อ hover และโฟกัส |
+| `pauseOnFocusLoss` | `boolean` | `true` | หยุดนับเวลาขณะหน้าต่างเบราว์เซอร์ไม่ได้โฟกัส |
+| `draggable` | `boolean` | `true` | ปัดไปด้านข้างเพื่อปิด |
+| `className` | `string` | ไม่มี | class เพิ่มเติม ถ้ามี `className` แบบรวมด้วยจะถูกรวมกัน |
+| `classNames` | `ToastClassNames` | ไม่มี | class ต่อส่วน: `toast`, `icon`, `content`, `title`, `description`, `action`, `close`, `progress` |
+| `colors` | `ToastColors` | ไม่มี | สีของคุณเองต่อประเภท: `success`, `error`, `info`, `warning`, `loading`, `default` ใช้สี CSS แบบไหนก็ได้ |
+| `style` | `ToastStyle` | ไม่มี | สไตล์ inline รวมถึงตัวแปร CSS เช่น `--sz-accent` |
+| `icon` | `string \| Node \| false` | ตามประเภท | icon ของคุณเอง (ข้อความหรือ DOM node) หรือ `false` เพื่อซ่อน |
+| `onClose` | `(reason, id) => void` | ไม่มี | ทำงานหนึ่งครั้งเมื่อ toast ปิด |
+| `onAutoClose` | `(id) => void` | ไม่มี | ทำงานเมื่อนับเวลาจบและปิด toast |
+| `id` | `string` | อัตโนมัติ | id ของคุณเอง เรียกซ้ำด้วย id เดิมจะรีเฟรช toast เดิมแทนการเพิ่มอีกอัน ใช้ได้ต่อ toast เท่านั้น |
+| `action` | `{ label, onClick?, keepOpen? }` | ไม่มี | ปุ่ม action เช่น Undo ใช้ได้ต่อ toast เท่านั้น |
+
+ดูตัวอย่างที่ [ตกแต่ง toast เอง](../../guides/customizing/)
+
+## Option แบบรวมเท่านั้น
+
+ตั้งด้วย `toast.configure()` เพราะมีผลกับทั้งกอง toast จึงตั้งต่อ toast ไม่ได้
+
+| Option | Type | ค่าเริ่มต้น | คำอธิบาย |
+|---|---|---|---|
+| `newestOnTop` | `boolean` | `false` | วาง toast ใหม่ไว้เหนืออันเก่า |
+| `rtl` | `boolean` | `false` | เลย์เอาต์ขวาไปซ้าย |
+| `limit` | `number` | `0` | จำนวน toast สูงสุดบนจอ `0` คือไม่จำกัด ที่เกินรอในคิว |
+
+## ประเภทของ toast
+
+`default`, `success`, `error`, `warning`, `info` และ `loading` ทางลัดอย่าง `toast.success()` ตั้งประเภทให้เอง
+
+## การเข้าถึง (Accessibility)
+
+toast ผิดพลาดใช้ `role="alert"` และประกาศแบบเร่งด่วน ส่วนที่เหลือใช้ `role="status"` ประกาศแบบสุภาพ ปุ่มปิดมี label สำหรับโปรแกรมอ่านหน้าจอ และแอนิเมชันจะสั้นลงเมื่อผู้เข้าชมเลือกลดการเคลื่อนไหว

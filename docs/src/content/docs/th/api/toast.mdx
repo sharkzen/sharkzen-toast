@@ -1,0 +1,80 @@
+---
+title: toast
+description: เอกสารอ้างอิง API ของฟังก์ชัน toast และตัวช่วย success, error, warning, info, loading, promise, update, dismiss, configure และ reset
+---
+
+```ts
+import { toast } from 'sharkzen-toast'
+```
+
+## toast(title, options?)
+
+แสดง toast แบบปกติ และคืน id ของ toast
+
+```ts
+const id = toast('สวัสดี', { description: 'ยินดีต้อนรับกลับ' })
+```
+
+## ทางลัดตามประเภท
+
+```ts
+toast.success(title, options?)
+toast.error(title, options?)
+toast.warning(title, options?)
+toast.info(title, options?)
+toast.loading(title, options?)
+```
+
+ทุกตัวคืน id ของ toast `loading` แสดงตัวหมุนและจะไม่ปิดเองจนกว่าคุณจะอัปเดตหรือปิด
+
+## toast.promise(promise, messages, options?)
+
+```ts
+toast.promise(
+  promise, // Promise<T> หรือ () => Promise<T>
+  {
+    pending: string,
+    success: string | ((value: T) => string),
+    error: string | ((error: unknown) => string),
+  },
+  options,
+): Promise<T>
+```
+
+ดู [Promise และการอัปเดต](../../guides/promise-and-update/)
+
+## toast.update(id, changes)
+
+แก้ toast ที่แสดงอยู่ `changes` รับ `title` และ [option](../options/) ใดก็ได้ รวมถึง `type` และ `description`
+
+## toast.dismiss(id?)
+
+ปิด toast หนึ่งอัน หรือถ้าไม่ส่งอะไรจะปิดทุก toast และล้างคิวที่รออยู่
+
+## toast.isActive(id)
+
+คืน `true` ขณะที่ toast ของ id นั้นแสดงอยู่บนจอหรือรออยู่ในคิว
+
+## toast.configure(config)
+
+ตั้งค่าเริ่มต้นให้ทุก toast ต่อจากนี้ รับ [option](../options/) ทุกตัวยกเว้น `type` และ `description` รวมถึง option ที่ตั้งได้เฉพาะแบบรวมคือ `newestOnTop`, `rtl` และ `limit`
+
+## toast.reset()
+
+คืนค่าเริ่มต้นที่มากับไลบรารี
+
+## Types
+
+Type ทั้งหมดถูกส่งออกให้ใช้:
+
+```ts
+import type {
+  ToastOptions,
+  ToastConfig,
+  ToastUpdate,
+  ToastType,
+  ToastPosition,
+  ToastTheme,
+  ToastTransition,
+} from 'sharkzen-toast'
+```

@@ -1,0 +1,40 @@
+---
+title: FAQ
+description: Answers about Sharkzen Toast - frameworks, server-side rendering, bundle size, customization, accessibility and content security policy.
+---
+
+## Which frameworks does it work with?
+
+All of them. The core is plain TypeScript with no framework code, so it works in vanilla JS, React, Next.js, Vue, Svelte and anything else that runs in a browser. React gets a small extra entry, `sharkzen-toast/react`.
+
+## How big is it?
+
+Under 7 kB gzipped for the whole library, including styles and icons, with no dependencies. The React entry adds a few hundred bytes.
+
+## Do I need to add a container or import CSS?
+
+No. The first toast creates its container and injects its styles.
+
+## Is it safe with server-side rendering?
+
+Yes. Nothing touches `document` or `window` at import time, and calls made on the server do nothing.
+
+## Can I change how it looks?
+
+Yes. Use the [CSS variables](../guides/theming/) for colors and corner radius, or pick one of the three themes.
+
+## Is it accessible?
+
+Error toasts are announced assertively and the rest politely. Hovering or focusing a toast pauses it, the close button is keyboard reachable and labeled, and animations are shortened for visitors who prefer reduced motion.
+
+## Does it work with a strict Content Security Policy?
+
+Styles are added through a `<style>` element at runtime. If your site blocks inline styles with a strict `style-src` policy, that element will be blocked. If this affects you, please open an issue so we can add nonce support.
+
+## How do I show a toast from outside a component?
+
+Just import `toast` and call it. It is a plain function, so it works in API clients, event handlers, stores and anywhere else.
+
+## Where do I report bugs or ask for features?
+
+On the GitHub repository's issue tracker. Use the "Edit this page" link at the bottom of any page to suggest documentation fixes.

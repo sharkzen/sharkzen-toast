@@ -1,0 +1,88 @@
+---
+title: Usage
+description: How to use Sharkzen Toast in vanilla JavaScript, React, Next.js, Vue and Svelte, including server-side rendering.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+
+The same `toast` function works everywhere. Pick your framework:
+
+<Tabs syncKey="framework">
+  <TabItem label="Vanilla JS">
+    ```ts
+    import { toast } from 'sharkzen-toast'
+
+    document.querySelector('#save')!.addEventListener('click', () => {
+      toast.success('Saved', { description: 'Your changes are live.' })
+    })
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx
+    import { useToast } from 'sharkzen-toast/react'
+
+    export function SaveButton() {
+      const toast = useToast()
+      return <button onClick={() => toast.success('Saved')}>Save</button>
+    }
+    ```
+  </TabItem>
+  <TabItem label="Next.js">
+    ```tsx
+    'use client'
+
+    import { useToast } from 'sharkzen-toast/react'
+
+    export function SaveButton() {
+      const toast = useToast()
+      return <button onClick={() => toast.success('Saved')}>Save</button>
+    }
+    ```
+    Toasts need the browser, so call them from a client component (or an event handler). The `sharkzen-toast/react` entry already carries the `"use client"` directive.
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <script setup lang="ts">
+    import { toast } from 'sharkzen-toast'
+    </script>
+
+    <template>
+      <button @click="toast.success('Saved')">Save</button>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <script lang="ts">
+      import { toast } from 'sharkzen-toast'
+    </script>
+
+    <button on:click={() => toast.success('Saved')}>Save</button>
+    ```
+  </TabItem>
+</Tabs>
+
+## Optional: set defaults once
+
+You do not need this to use the library. Every example above works as is. Use `toast.configure()` only if you want every toast in your app to look or behave the same way, so you do not repeat the same options on each call. Call it once at app start, for example in your entry file or in a client module that loads once (not inside a component that re-renders). Calling it again is harmless: it just updates the defaults.
+
+```ts
+toast.configure({
+  position: 'bottom-center',
+  theme: 'colored',
+  duration: 5000,
+  limit: 3,
+})
+```
+
+After that, a plain `toast.success('Saved')` behaves like this call would without any setup:
+
+```ts
+toast.success('Saved', { position: 'bottom-center', theme: 'colored', duration: 5000 })
+```
+
+Options passed to a single toast always win over the defaults.
+
+## Server-side rendering
+
+Importing the library is safe on the server. Calling `toast()` on the server returns an empty string and does nothing, so you will not see errors in Next.js, Nuxt or SvelteKit builds.

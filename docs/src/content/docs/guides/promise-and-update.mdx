@@ -1,0 +1,106 @@
+---
+title: Promises and updates
+description: Show a loading toast that turns into success or error with toast.promise, change a toast in place with toast.update, and control the queue with limit.
+---
+
+## Promise toasts
+
+`toast.promise()` shows a loading toast, then turns it into a success or error toast when the promise settles:
+
+```ts
+toast.promise(
+  saveProfile(),
+  {
+    pending: 'Saving...',
+    success: (user) => `Saved ${user.name}`,
+    error: (err) => `Could not save: ${(err as Error).message}`,
+  },
+  { position: 'bottom-center' },
+)
+```
+
+- `success` and `error` can be plain strings or functions that receive the result or the error.
+- The promise is returned, so you can keep using `await` or `.then()`.
+- You can pass a function that returns a promise instead of the promise itself.
+
+## Example: create a user
+
+A real request has three moments: waiting, success and failure. The message usually comes from your backend, so read it from the response and let `toast.promise()` show it.
+
+```ts
+type NewUser = { name: string; email: string }
+
+async function createUser(data: NewUser) {
+  const res = await fetch('/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  const body = await res.json().catch(() => ({}))
+
+  // fetch only rejects on network errors. Turn HTTP errors into rejections yourself.
+  if (!res.ok) throw new Error(body.message ?? 'Could not create the user')
+  return body as { name: string; message?: string }
+}
+
+toast.promise(createUser({ name: 'Ada', email: 'ada@example.com' }), {
+  pending: 'Creating user...',
+  success: (user) => user.message ?? `Created ${user.name}`,
+  error: (err) => (err as Error).message, // the message your backend sent
+})
+```
+
+If the backend answers `{ "message": "Email already in use" }` with status 409, the toast turns into an error that says exactly that.
+
+### Show the message as a description
+
+`toast.promise()` sets the title. To put the backend message on the second line, use `toast.loading()` and `toast.update()` yourself:
+
+```ts
+const id = toast.loading('Creating user...')
+
+try {
+  const user = await createUser(form)
+  toast.update(id, { title: 'User created', description: user.message, type: 'success' })
+} catch (err) {
+  toast.update(id, {
+    title: 'Could not create user',
+    description: (err as Error).message,
+    type: 'error',
+    duration: 6000, // leave errors up a little longer
+  })
+}
+```
+
+The loading toast stays until you update it, then the countdown starts from the new type.
+
+## Update a toast
+
+Every call returns the toast's id. Pass it to `toast.update()` to change the toast in place. The countdown restarts:
+
+```ts
+const id = toast.loading('Uploading...')
+
+upload().then(() => {
+  toast.update(id, { title: 'Done', type: 'success', description: 'File uploaded.' })
+})
+```
+
+## Dismiss
+
+```ts
+toast.dismiss(id) // one toast
+toast.dismiss() // all toasts, and anything waiting in the queue
+```
+
+## Limit how many show at once
+
+```ts
+toast.configure({ limit: 3 })
+```
+
+Toasts beyond the limit wait in a queue and appear as earlier ones close. `toast.update()` also works on a toast that is still waiting.
+
+## Pausing
+
+A toast stops its countdown while it is hovered or focused, while it is being dragged, and while the browser window is not focused. The countdown bar stops with it and resumes from the same spot.

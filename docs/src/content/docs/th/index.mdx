@@ -1,0 +1,37 @@
+---
+title: Sharkzen Toast
+description: ไลบรารี toast แจ้งเตือนขนาดเล็ก ไม่มี dependency ใช้ได้กับ JavaScript ธรรมดา, React, Next.js, Vue และ Svelte มีธีม, promise toast, ปัดเพื่อปิด และ responsive
+template: splash
+hero:
+  tagline: toast แจ้งเตือนที่ใช้แล้วรู้สึกดี
+---
+
+## สิ่งที่ได้
+
+<ul class="zfeatures not-content">
+  <li><strong>ไม่มี dependency</strong><p>สไตล์และ icon อยู่ในแพ็กเกจแล้ว ขนาดไม่ถึง 7 kB (gzip) ไม่ต้องติดตั้งอะไรเพิ่ม</p></li>
+  <li><strong>ใช้ได้ทุก framework</strong><p>แกนหลักเป็น TypeScript ธรรมดา ใช้กับ JavaScript, React, Next.js, Vue และ Svelte import บนเซิร์ฟเวอร์ได้อย่างปลอดภัย</p></li>
+  <li><strong>Promise toast</strong><p>แสดง toast กำลังโหลด แล้วเปลี่ยนเป็นสำเร็จหรือผิดพลาดได้จากการเรียกครั้งเดียว</p></li>
+  <li><strong>Hover, โฟกัส, ปัด</strong><p>ตัวนับเวลาหยุดเมื่อ hover หรือโฟกัส และปัดไปด้านข้างเพื่อปิดได้</p></li>
+  <li><strong>Light, dark และ colored</strong><p>ธีม 3 แบบ แอนิเมชัน 4 แบบ และ 6 ตำแหน่ง เปลี่ยนด้วย option เดียว</p></li>
+  <li><strong>รองรับจอเล็ก</strong><p>บนมือถือ toast เต็มความกว้างและเว้นพื้นที่รอยบากกับแถบด้านล่างให้</p></li>
+</ul>
+
+## เรียกครั้งเดียวก็พอ
+
+```ts
+import { toast } from 'sharkzen-toast'
+
+toast.success('บันทึกแล้ว', { description: 'การเปลี่ยนแปลงของคุณเผยแพร่แล้ว' })
+```
+
+ไม่ต้องมี provider ไม่ต้องวาง container และไม่ต้องใช้ไฟล์ CSS การเรียกครั้งแรกจะสร้างทุกอย่างที่ต้องใช้เอง
+
+## ไปต่อ
+
+<ul class="znext not-content">
+  <li><a href="./getting-started/usage/"><b>ใช้กับ framework ของคุณ</b><span>JavaScript, React, Next.js, Vue, Svelte</span></a></li>
+  <li><a href="./playground/"><b>Playground</b><span>ปรับทุก option แล้วคัดลอกโค้ด</span></a></li>
+  <li><a href="./guides/theming/"><b>ธีม</b><span>ธีม ตัวแปร CSS ตำแหน่ง</span></a></li>
+  <li><a href="./api/toast/"><b>อ้างอิง API</b><span>ทุกฟังก์ชันและ option</span></a></li>
+</ul>

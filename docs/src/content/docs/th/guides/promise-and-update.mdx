@@ -1,0 +1,106 @@
+---
+title: Promise และการอัปเดต
+description: แสดง toast กำลังโหลดที่เปลี่ยนเป็นสำเร็จหรือล้มเหลวด้วย toast.promise แก้ toast ที่แสดงอยู่ด้วย toast.update และควบคุมคิวด้วย limit
+---
+
+## Promise toast
+
+`toast.promise()` แสดง toast กำลังโหลด แล้วเปลี่ยนเป็น toast สำเร็จหรือผิดพลาดเมื่อ promise จบ:
+
+```ts
+toast.promise(
+  saveProfile(),
+  {
+    pending: 'กำลังบันทึก...',
+    success: (user) => `บันทึก ${user.name} แล้ว`,
+    error: (err) => `บันทึกไม่สำเร็จ: ${(err as Error).message}`,
+  },
+  { position: 'bottom-center' },
+)
+```
+
+- `success` และ `error` เป็นสตริงธรรมดา หรือฟังก์ชันที่รับผลลัพธ์หรือ error ก็ได้
+- ฟังก์ชันคืนค่า promise เดิมให้ ใช้ `await` หรือ `.then()` ต่อได้
+- ส่งฟังก์ชันที่คืน promise แทนตัว promise เองก็ได้
+
+## ตัวอย่าง: สร้าง user
+
+การเรียก backend จริงมี 3 ช่วง คือรอ สำเร็จ และล้มเหลว ข้อความมักมาจาก backend ให้อ่านจาก response แล้วส่งให้ `toast.promise()` แสดง
+
+```ts
+type NewUser = { name: string; email: string }
+
+async function createUser(data: NewUser) {
+  const res = await fetch('/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  const body = await res.json().catch(() => ({}))
+
+  // fetch จะ reject เฉพาะตอนเครือข่ายล้ม ส่วน HTTP error ต้องโยนเองให้เป็น rejection
+  if (!res.ok) throw new Error(body.message ?? 'สร้าง user ไม่สำเร็จ')
+  return body as { name: string; message?: string }
+}
+
+toast.promise(createUser({ name: 'Ada', email: 'ada@example.com' }), {
+  pending: 'กำลังสร้าง user...',
+  success: (user) => user.message ?? `สร้าง ${user.name} แล้ว`,
+  error: (err) => (err as Error).message, // ข้อความที่ backend ส่งมา
+})
+```
+
+ถ้า backend ตอบ `{ "message": "อีเมลนี้ถูกใช้แล้ว" }` พร้อมสถานะ 409 toast จะเปลี่ยนเป็น error และแสดงข้อความนั้นตรงๆ
+
+### แสดงข้อความเป็นคำอธิบาย
+
+`toast.promise()` กำหนดเฉพาะหัวเรื่อง ถ้าอยากให้ข้อความจาก backend อยู่บรรทัดที่สอง ให้ใช้ `toast.loading()` กับ `toast.update()` เอง:
+
+```ts
+const id = toast.loading('กำลังสร้าง user...')
+
+try {
+  const user = await createUser(form)
+  toast.update(id, { title: 'สร้าง user แล้ว', description: user.message, type: 'success' })
+} catch (err) {
+  toast.update(id, {
+    title: 'สร้าง user ไม่สำเร็จ',
+    description: (err as Error).message,
+    type: 'error',
+    duration: 6000, // ให้ error ค้างนานขึ้นอีกหน่อย
+  })
+}
+```
+
+toast กำลังโหลดจะค้างจนกว่าคุณจะอัปเดต แล้วตัวนับเวลาจะเริ่มใหม่ตามประเภทที่เปลี่ยน
+
+## อัปเดต toast
+
+ทุกครั้งที่เรียกจะได้ id ของ toast กลับมา ส่ง id ให้ `toast.update()` เพื่อแก้ toast ที่เดิม ตัวนับเวลาจะเริ่มใหม่:
+
+```ts
+const id = toast.loading('กำลังอัปโหลด...')
+
+upload().then(() => {
+  toast.update(id, { title: 'เสร็จแล้ว', type: 'success', description: 'อัปโหลดไฟล์แล้ว' })
+})
+```
+
+## ปิด toast
+
+```ts
+toast.dismiss(id) // หนึ่งอัน
+toast.dismiss() // ทั้งหมด รวมถึงที่รออยู่ในคิว
+```
+
+## จำกัดจำนวนที่แสดงพร้อมกัน
+
+```ts
+toast.configure({ limit: 3 })
+```
+
+toast ที่เกินจะรอในคิวและแสดงเมื่ออันก่อนหน้าปิดไป `toast.update()` ใช้กับ toast ที่ยังรออยู่ในคิวได้ด้วย
+
+## การหยุดนับเวลา
+
+toast จะหยุดนับเวลาเมื่อ hover หรือโฟกัส ขณะกำลังลาก และขณะที่หน้าต่างเบราว์เซอร์ไม่ได้โฟกัส หลอดเวลาจะหยุดตามและวิ่งต่อจากจุดเดิม
