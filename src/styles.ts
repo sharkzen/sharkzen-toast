@@ -2,11 +2,10 @@
 // Override the look with --sz-bg, --sz-fg, --sz-border, --sz-muted, --sz-accent, --sz-radius and --sz-font.
 // Per-type brand colors: --sz-success, --sz-error, --sz-info, --sz-warning, --sz-loading, --sz-default.
 // Without --sz-font the toast inherits the page font.
-// Everything sits in one cascade layer. Unlayered CSS always beats layered CSS, and a layer
-// declared first loses to later ones, so page styles, Tailwind (v3 and v4) and CSS modules
-// all override the defaults without needing higher specificity or !important.
-export const css = `@layer sharkzen-toast{
-.sz-container{position:fixed;z-index:2147483647;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;max-width:100%;pointer-events:none;
+// Deliberately not in an @layer: unlayered CSS beats every layer, so resets such as Tailwind v4
+// preflight (@layer base) cannot flatten the toast. The <style> is appended to <head>, so page CSS
+// at equal specificity still wins; override with classNames, style or the --sz-* variables.
+export const css = `.sz-container{position:fixed;z-index:2147483647;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;max-width:100%;pointer-events:none;
 padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
 --sz-x:24px;--sz-y:0px}
 .sz-top-right{top:0;right:0}
@@ -105,4 +104,4 @@ transform-origin:left;animation:sz-bar linear forwards}
 @media (prefers-reduced-motion:reduce){
 .sz-toast[data-transition]{animation-duration:.01ms!important}
 .sz-draw,.sz-pop,.sz-toast__icon{animation-duration:.01ms!important;animation-delay:0s!important}}
-}`
+`

@@ -29,11 +29,13 @@ describe('rendering', () => {
     expect(document.querySelector('.sz-toast img')).toBeNull()
   })
 
-  it('injects its styles first in <head> so page CSS can override them', () => {
+  it('appends its styles last in <head>, unlayered, so page CSS can override them', () => {
     document.head.innerHTML = '<link rel="stylesheet" href="/app.css">'
     document.getElementById('sz-toast-styles')?.remove()
     toast('Hi')
-    expect(document.head.firstElementChild?.id).toBe('sz-toast-styles')
+    const style = document.head.lastElementChild as HTMLElement
+    expect(style.id).toBe('sz-toast-styles')
+    expect(style.textContent).not.toContain('@layer')
   })
 
   it.each(['light', 'dark', 'colored'] as const)('applies theme %s', (theme) => {

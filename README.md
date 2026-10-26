@@ -82,6 +82,8 @@ On screens ≤ 480px toasts automatically become full width and stick to the top
 
 Override CSS variables: `--sz-bg`, `--sz-fg`, `--sz-border`, `--sz-muted`, `--sz-accent`, `--sz-radius`, `--sz-font`. Toasts use your page's font unless you set `--sz-font`.
 
+The injected CSS is plain (unlayered) and appended to the end of `<head>`, so CSS resets in `@layer base` such as Tailwind v4 preflight cannot flatten it. It does not use `@layer`, so to restyle a toast use `classNames`, `style` or the `--sz-*` variables. A rule of your own needs equal or higher specificity to win.
+
 ## Documentation
 
 The docs site (English and Thai) lives in [`docs/`](docs) and is built with Astro Starlight. It imports the library from `src/`, so every demo runs the current code.

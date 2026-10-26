@@ -279,11 +279,13 @@ describe('classNames per part', () => {
     expect(first().querySelector('.sz-toast__title')?.className).toBe('sz-toast__title two')
   })
 
-  it('the library CSS sits in a cascade layer so page and Tailwind v4 styles win', () => {
+  it('injects unlayered CSS so @layer resets (Tailwind v4 preflight) cannot override it', () => {
     toast('Hi')
     const css = document.getElementById('sz-toast-styles')?.textContent ?? ''
-    expect(css.startsWith('@layer sharkzen-toast{')).toBe(true)
+    expect(css).not.toContain('@layer')
+    expect(css.startsWith('.sz-container{')).toBe(true)
   })
+
 })
 
 describe('colors per type', () => {

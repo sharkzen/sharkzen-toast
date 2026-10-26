@@ -13,7 +13,7 @@ Add your own class to any toast, for Tailwind, CSS modules or plain CSS:
 toast.success('Saved', { className: 'font-mono shadow-xl' })
 ```
 
-The library's styles live in a CSS cascade layer, so your own CSS, Tailwind utilities (v3 and v4) and CSS modules all win, whatever the specificity. You do not need `!important`.
+The library's styles are plain CSS (not in an `@layer`) added to the end of `<head>`, so resets such as Tailwind v4 preflight cannot flatten the toast. To restyle it, use `classNames`, `style` or the `--sz-*` variables. Your own rule needs equal or higher specificity to win.
 
 ### Style each part (Tailwind and others)
 

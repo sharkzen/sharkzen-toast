@@ -13,7 +13,7 @@ description: เพิ่ม class และสไตล์ของคุณเ
 toast.success('บันทึกแล้ว', { className: 'font-mono shadow-xl' })
 ```
 
-สไตล์ของ library อยู่ใน CSS cascade layer ดังนั้น CSS ของคุณเอง, Tailwind (ทั้ง v3 และ v4) และ CSS modules จะชนะเสมอ ไม่ว่า specificity เป็นเท่าไหร่ ไม่ต้องใช้ `!important`
+สไตล์ของ library เป็น CSS ธรรมดา (ไม่อยู่ใน `@layer`) และถูกเพิ่มไว้ท้าย `<head>` ทำให้ reset อย่าง Tailwind v4 preflight ไม่ทับ toast ถ้าจะปรับหน้าตา ให้ใช้ `classNames`, `style` หรือตัวแปร `--sz-*` ส่วน CSS ของคุณเองต้องมี specificity เท่ากันหรือสูงกว่าจึงจะชนะ
 
 ### ตกแต่งแต่ละส่วน (Tailwind และอื่นๆ)
 

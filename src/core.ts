@@ -202,8 +202,8 @@ function ensureStyles() {
   const style = document.createElement('style')
   style.id = STYLE_ID
   style.textContent = css
-  // First in <head>, so any stylesheet the page loads later wins at equal specificity.
-  document.head.prepend(style)
+  // Unlayered and last in <head>, so it beats @layer resets and page CSS at equal specificity still wins.
+  document.head.append(style)
 }
 
 function getContainer(position: ToastPosition) {
